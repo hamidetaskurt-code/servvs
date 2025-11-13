@@ -1,0 +1,48 @@
+<!-- /desktop/src/pages/customers.html -->
+<div id="customersPage" class="page">
+    <div class="page-header">
+        <h2>Müşteri Yönetimi</h2>
+        <button id="add-customer-btn" class="btn-primary">+ Yeni Müşteri Ekle</button>
+    </div>
+
+    <div class="main-content-area">
+        <div class="customer-list-container">
+            <!-- Advanced Filters -->
+            <div class="search-filter-bar">
+                <input type="text" id="customerSearch" placeholder="🔍 Akıllı Arama (Ad, Telefon, Adres)...">
+                <select id="customerTagFilter">
+                    <option value="">Tüm Etiketler</option>
+                    <option value="vip">VIP</option>
+                    <option value="corporate">Kurumsal</option>
+                    <option value="problematic">Sorunlu</option>
+                </select>
+            </div>
+
+            <!-- Customer Table -->
+            <div class="table-container">
+                <table id="customersTable">
+                    <thead>
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>Telefon</th>
+                            <th>Şehir</th>
+                            <th>Etiketler</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Müşteri listesi dinamik olarak yüklenecek -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Customer Detail Side Panel -->
+        <div class="side-panel" id="customerDetailSidePanel">
+            <!-- Yan panel içeriği dinamik olarak yüklenecek -->
+            <div class="side-panel-placeholder">
+                <p>Müşteri detaylarını görmek için bir satıra tıklayın.</p>
+            </div>
+        </div>
+    </div>
+</div>
