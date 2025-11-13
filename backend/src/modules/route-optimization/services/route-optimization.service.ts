@@ -192,6 +192,74 @@ export class RouteOptimizationService {
   /**
    * Rota alternatifleri oluştur
    */
+  private solveTspForTechnician(
+    serviceIndices: number[],
+    distanceMatrix: any,
+    services: Service[],
+    useDuration = false, // true for fastest, false for shortest
+  ): { path: string[]; distance: number; duration: number } {
+    if (serviceIndices.length === 0) {
+      return { path: [], distance: 0, duration: 0 };
+    }
+
+    const unvisited = new Set(serviceIndices);
+    const pathIndices: number[] = [];
+    let totalDistance = 0;
+    let totalDuration = 0;
+
+    // Start with the first service in the list
+    let currentIdx = serviceIndices[0];
+    pathIndices.push(currentIdx);
+    unvisited.delete(currentIdx);
+
+    while (unvisited.size > 0) {
+      let nearestIdx = -1;
+      let minMetric = Infinity;
+
+      const matrixRow = distanceMatrix.rows[currentIdx]?.elements;
+      if (!matrixRow) {
+        this.logger.error(`Distance matrix row not found for index ${currentIdx}`);
+        break;
+      }
+
+      for (const nextIdx of unvisited) {
+        const element = matrixRow[nextIdx];
+        if (!element || element.status !== 'OK') continue;
+
+        const metricValue = useDuration
+          ? element.duration_in_traffic?.value ?? element.duration.value
+          : element.distance.value;
+
+        if (metricValue < minMetric) {
+          minMetric = metricValue;
+          nearestIdx = nextIdx;
+        }
+      }
+
+      if (nearestIdx !== -1) {
+        const leg = matrixRow[nearestIdx];
+        totalDistance += leg.distance.value;
+        totalDuration += leg.duration_in_traffic?.value ?? leg.duration.value;
+
+        currentIdx = nearestIdx;
+        pathIndices.push(currentIdx);
+        unvisited.delete(currentIdx);
+      } else {
+        // This can happen if there are no reachable nodes from the current one
+        this.logger.warn(
+          `Could not find next nearest service from index ${currentIdx}. Remaining: ${unvisited.size}`,
+        );
+        break;
+      }
+    }
+
+    return {
+      path: pathIndices.map((idx) => services[idx].id),
+      distance: totalDistance,
+      duration: totalDuration,
+    };
+  }
+
   private async generateRouteAlternatives(
     services: Service[],
     technicians: User[],
@@ -200,11 +268,28 @@ export class RouteOptimizationService {
   ): Promise<any[]> {
     const alternatives: any[] = [];
 
-    // Algoritma 1: K-means clustering + Greedy assignment
-    const alternative1 = this.createBalancedRoute(
+    // All strategies will use a round-robin assignment for simplicity,
+    // but solve the resulting TSP with different metrics.
+    const technicianServiceIndices: { [key: string]: number[] } = {};
+    const serviceMap = new Map(services.map((s, i) => [s.id, i]));
+
+    technicians.forEach((t) => {
+      technicianServiceIndices[t.id] = [];
+    });
+    services.forEach((service, index) => {
+      const techIndex = index % technicians.length;
+      technicianServiceIndices[technicians[techIndex].id].push(
+        serviceMap.get(service.id),
+      );
+    });
+
+    // Algoritma 1: Dengeli Rota (Balanced) - Balances service count, optimizes path by distance
+    const alternative1 = this.createRouteFromAssignment(
       services,
       technicians,
       distanceMatrix,
+      technicianServiceIndices,
+      false, // use distance for optimization
     );
     alternatives.push({
       id: 1,
@@ -213,11 +298,13 @@ export class RouteOptimizationService {
       ...alternative1,
     });
 
-    // Algoritma 2: Nearest Neighbor
-    const alternative2 = this.createFastestRoute(
+    // Algoritma 2: En Hızlı Rota (Fastest) - Balances service count, optimizes path by duration
+    const alternative2 = this.createRouteFromAssignment(
       services,
       technicians,
       distanceMatrix,
+      technicianServiceIndices,
+      true, // use duration for optimization
     );
     alternatives.push({
       id: 2,
@@ -226,60 +313,49 @@ export class RouteOptimizationService {
       ...alternative2,
     });
 
-    // Algoritma 3: Minimum Distance
-    const alternative3 = this.createShortestRoute(
-      services,
-      technicians,
-      distanceMatrix,
-    );
+    // Algoritma 3: En Kısa Rota (Shortest) - Balances service count, optimizes path by distance
+    // For this simple implementation, it's the same as Balanced.
+    // A real implementation would use a different assignment strategy.
     alternatives.push({
       id: 3,
       name: 'En Kısa Rota',
       goal: 'shortest',
-      ...alternative3,
+      ...alternative1,
     });
 
     return alternatives;
   }
 
-  /**
-   * Dengeli rota oluştur
-   */
-  private createBalancedRoute(
+  private createRouteFromAssignment(
     services: Service[],
     technicians: User[],
     distanceMatrix: any,
+    technicianServiceIndices: { [key: string]: number[] },
+    useDuration: boolean,
   ): any {
-    // Basit round-robin ataması (gerçek uygulamada k-means kullanılabilir)
-    const technicianServices: { [key: string]: Service[] } = {};
-    technicians.forEach((t) => {
-      technicianServices[t.id] = [];
-    });
-
-    services.forEach((service, index) => {
-      const techIndex = index % technicians.length;
-      technicianServices[technicians[techIndex].id].push(service);
-    });
-
     let totalDistance = 0;
     let totalDuration = 0;
 
-    const technicianRoutes = Object.entries(technicianServices).map(
-      ([techId, servs]) => {
-        const distance = servs.length * 15; // Mock: 15 km ortalama
-        const duration = servs.length * 1.5; // Mock: 1.5 saat ortalama
+    const technicianRoutes = Object.entries(technicianServiceIndices).map(
+      ([techId, serviceIndices]) => {
+        const result = this.solveTspForTechnician(
+          serviceIndices,
+          distanceMatrix,
+          services,
+          useDuration,
+        );
 
-        totalDistance += distance;
-        totalDuration += duration;
+        totalDistance += result.distance;
+        totalDuration += result.duration;
 
         return {
           technicianId: techId,
           technicianName:
             technicians.find((t) => t.id === techId)?.firstName || 'Unknown',
-          services: servs.map((s) => s.id),
-          servicesCount: servs.length,
-          estimatedDistance: distance,
-          estimatedDuration: duration,
+          services: result.path,
+          servicesCount: result.path.length,
+          estimatedDistance: result.distance, // in meters
+          estimatedDuration: result.duration, // in seconds
         };
       },
     );
@@ -288,32 +364,8 @@ export class RouteOptimizationService {
       technicianRoutes,
       totalDistance,
       totalDuration,
-      score: 85,
+      score: 100 - totalDistance / 100000 - totalDuration / 36000, // Simple score
     };
-  }
-
-  /**
-   * En hızlı rota oluştur
-   */
-  private createFastestRoute(
-    services: Service[],
-    technicians: User[],
-    distanceMatrix: any,
-  ): any {
-    // Nearest Neighbor algoritması simülasyonu
-    return this.createBalancedRoute(services, technicians, distanceMatrix);
-  }
-
-  /**
-   * En kısa rota oluştur
-   */
-  private createShortestRoute(
-    services: Service[],
-    technicians: User[],
-    distanceMatrix: any,
-  ): any {
-    // Minimum distance algoritması simülasyonu
-    return this.createBalancedRoute(services, technicians, distanceMatrix);
   }
 
   /**
