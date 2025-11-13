@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { CommunicationsService } from './communications.service';
 
 @Controller('communications')
@@ -76,12 +85,32 @@ export class CommunicationsController {
   }
 
   @Get('campaigns')
-  getCampaigns() {
-    return this.communicationsService.getCampaigns();
+  getCampaigns(@Query('status') status?: string) {
+    return this.communicationsService.getCampaigns(status);
+  }
+
+  @Get('campaigns/:id')
+  getCampaign(@Param('id') id: string) {
+    return this.communicationsService.getCampaign(id);
+  }
+
+  @Put('campaigns/:id')
+  updateCampaign(@Param('id') id: string, @Body() updateData: any) {
+    return this.communicationsService.updateCampaign(id, updateData);
+  }
+
+  @Delete('campaigns/:id')
+  deleteCampaign(@Param('id') id: string) {
+    return this.communicationsService.deleteCampaign(id);
   }
 
   @Get('campaigns/:id/stats')
   getCampaignStats(@Param('id') id: string) {
     return this.communicationsService.getCampaignStats(id);
+  }
+
+  @Post('campaigns/:id/send')
+  sendCampaign(@Param('id') id: string) {
+    return this.communicationsService.sendCampaign(id);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Between, In } from 'typeorm';
+import { Repository, Like, Between, In, LessThanOrEqual, MoreThan } from 'typeorm';
 import { Customer } from './entities/customer.entity';
 import { Device } from './entities/device.entity';
 import { Document } from './entities/document.entity';
@@ -8,6 +8,7 @@ import { Communication } from './entities/communication.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CreateDeviceDto } from './dto/create-device.dto';
+import { CommunicationsService } from '../communications/communications.service';
 
 @Injectable()
 export class CustomersService {
@@ -20,6 +21,7 @@ export class CustomersService {
     private documentsRepository: Repository<Document>,
     @InjectRepository(Communication)
     private communicationsRepository: Repository<Communication>,
+    private communicationsService: CommunicationsService,
   ) {}
 
   // Müşteri CRUD işlemleri
@@ -191,5 +193,77 @@ export class CustomersService {
     const customer = await this.findOne(customerId);
     customer.satisfactionScore = score;
     return await this.customersRepository.save(customer);
+  }
+
+  // Garanti bitiş uyarıları
+  async getExpiringWarranties(daysAhead: number = 30): Promise<Device[]> {
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + daysAhead);
+
+    return await this.devicesRepository
+      .createQueryBuilder('device')
+      .leftJoinAndSelect('device.customer', 'customer')
+      .where('device.warrantyEndDate IS NOT NULL')
+      .andWhere('device.warrantyEndDate > :today', { today })
+      .andWhere('device.warrantyEndDate <= :futureDate', { futureDate })
+      .andWhere('device.isActive = true')
+      .orderBy('device.warrantyEndDate', 'ASC')
+      .getMany();
+  }
+
+  async sendWarrantyExpirationReminders(
+    daysAhead: number = 30,
+    type: 'sms' | 'email' | 'both' = 'both',
+  ): Promise<any> {
+    const expiringDevices = await this.getExpiringWarranties(daysAhead);
+
+    const results = {
+      total: expiringDevices.length,
+      sent: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const device of expiringDevices) {
+      const customer = device.customer;
+      if (!customer) continue;
+
+      const daysLeft = Math.ceil(
+        (new Date(device.warrantyEndDate).getTime() - new Date().getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
+
+      const message = `Sayın ${customer.fullName},\n\n${device.brand} ${
+        device.model
+      } (S/N: ${device.serialNumber}) cihazınızın garantisi ${daysLeft} gün sonra ${
+        new Date(device.warrantyEndDate).toLocaleDateString('tr-TR')
+      } tarihinde sona erecektir.\n\nGaranti uzatma teklifimiz için lütfen bizimle iletişime geçiniz.\n\nTeşekkür ederiz,\nAkın Kombi`;
+
+      try {
+        if (type === 'sms' || type === 'both') {
+          await this.communicationsService.sendSMS(customer.phone, message);
+        }
+
+        if (type === 'email' || type === 'both') {
+          await this.communicationsService.sendEmail(
+            customer.email,
+            'Garanti Bitiş Hatırlatması',
+            message,
+          );
+        }
+
+        results.sent++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          deviceId: device.id,
+          customerId: customer.id,
+          error: error.message,
+        });
+      }
+    }
+
+    return results;
   }
 }

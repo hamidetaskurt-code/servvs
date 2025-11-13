@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { ServicesModule } from './modules/services/services.module';
@@ -19,17 +19,22 @@ import { SettingsModule } from './modules/settings/settings.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'akin-kombi-db.cefaws2swb2i.us-east-1.rds.amazonaws.com',
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USERNAME || 'akinadmin',
-      password: process.env.DB_PASSWORD || 'AkinKombi2024!Secure',
-      database: process.env.DB_NAME || 'akinkombi_new',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false, // Production'da false olmalı
-      logging: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USER'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false,
+        logging: configService.get('NODE_ENV') === 'development',
+      }),
+      inject: [ConfigService],
     }),
     DashboardModule,
     CustomersModule,

@@ -10,6 +10,7 @@ import {
 import { FinanceService } from './finance.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateInstallmentPlanDto } from './dto/create-installment-plan.dto';
 import { PaymentStatus } from '../../common/enums/payment-status.enum';
 
 @Controller('finance')
@@ -71,5 +72,62 @@ export class FinanceController {
   @Get('customers/:customerId/profitability')
   getCustomerProfitability(@Param('customerId') customerId: string) {
     return this.financeService.getCustomerProfitability(customerId);
+  }
+
+  @Post('invoices/reminders/bulk')
+  sendOverdueInvoiceReminders(
+    @Body()
+    body: {
+      type?: 'sms' | 'email' | 'both';
+      minDaysOverdue?: number;
+    },
+  ) {
+    return this.financeService.sendOverdueInvoiceReminders(
+      body.type || 'both',
+      body.minDaysOverdue || 1,
+    );
+  }
+
+  @Post('invoices/:id/reminder')
+  sendInvoiceReminder(
+    @Param('id') id: string,
+    @Body() body: { type?: 'sms' | 'email' | 'both' },
+  ) {
+    return this.financeService.sendInvoiceReminder(id, body.type || 'both');
+  }
+
+  @Post('installments/plan')
+  createInstallmentPlan(@Body() createInstallmentPlanDto: CreateInstallmentPlanDto) {
+    return this.financeService.createInstallmentPlan(createInstallmentPlanDto);
+  }
+
+  @Get('installments/invoice/:invoiceId')
+  getInstallmentsByInvoice(@Param('invoiceId') invoiceId: string) {
+    return this.financeService.getInstallmentsByInvoice(invoiceId);
+  }
+
+  @Get('installments/customer/:customerId')
+  getInstallmentsByCustomer(@Param('customerId') customerId: string) {
+    return this.financeService.getInstallmentsByCustomer(customerId);
+  }
+
+  @Post('installments/:id/pay')
+  payInstallment(
+    @Param('id') id: string,
+    @Body() body: { paymentTransactionId?: string },
+  ) {
+    return this.financeService.payInstallment(id, body.paymentTransactionId);
+  }
+
+  @Get('installments/upcoming')
+  getUpcomingInstallments(@Query('daysAhead') daysAhead?: string) {
+    return this.financeService.getUpcomingInstallments(
+      daysAhead ? parseInt(daysAhead) : 7,
+    );
+  }
+
+  @Get('installments/overdue')
+  getOverdueInstallments() {
+    return this.financeService.getOverdueInstallments();
   }
 }
