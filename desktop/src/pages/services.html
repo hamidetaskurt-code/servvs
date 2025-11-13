@@ -1,0 +1,44 @@
+<div id="servicesPage" class="page">
+    <div class="page-header">
+        <h2>Servisler</h2>
+        <button class="btn-primary" onclick="showAddService()">+ Yeni Servis</button>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="serviceSearch" placeholder="🔍 Servis ara..." oninput="searchServices()">
+        <select id="statusFilter" onchange="filterServices()">
+            <option value="">Tüm Durumlar</option>
+            <option value="pending">Bekliyor</option>
+            <option value="in_progress">İşlemde</option>
+            <option value="completed">Tamamlandı</option>
+            <option value="cancelled">İptal</option>
+        </select>
+        <button class="btn btn-secondary" onclick="exportToExcel('services')">Excel İndir</button>
+        <div class="pagination-controls">
+            <button onclick="previousPage('services')" id="servicePrevBtn">«</button>
+            <span id="servicePageInfo">1/1</span>
+            <button onclick="nextPage('services')" id="serviceNextBtn">»</button>
+            <select id="servicePageSize" onchange="changePageSize('services')">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-container">
+        <table id="servicesTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('services', 0)">ID ↕</th>
+                    <th onclick="sortTable('services', 1)">Müşteri ↕</th>
+                    <th onclick="sortTable('services', 2)">Cihaz ↕</th>
+                    <th onclick="sortTable('services', 3)">Durum ↕</th>
+                    <th onclick="sortTable('services', 4)">Öncelik ↕</th>
+                    <th onclick="sortTable('services', 5)">Teknisyen ↕</th>
+                    <th onclick="sortTable('services', 6)">Tarih ↕</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
