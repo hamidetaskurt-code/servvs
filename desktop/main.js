@@ -20,7 +20,7 @@ function createWindow() {
         show: false
     });
 
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile('src/pages/index.html');
 
     // Open DevTools automatically in development
     mainWindow.webContents.openDevTools();
