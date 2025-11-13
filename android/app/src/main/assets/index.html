@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akın Kombi - Yönetim Paneli</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="login-container">
+                <div class="logo">
+                    <h1>🔥 AKIN KOMBİ</h1>
+                    <p>Servis Yönetim Sistemi</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" id="username" required placeholder="demo">
+                    </div>
+                    <div class="form-group">
+                        <label>Şifre</label>
+                        <input type="password" id="password" required placeholder="demo">
+                    </div>
+                    <button type="submit" class="btn-primary">Giriş Yap</button>
+                    <p style="text-align: center; margin-top: 15px; color: #666; font-size: 13px;">
+                        Demo: <strong>demo / demo</strong>
+                    </p>
+                </form>
+                <div id="loginError" class="error"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen">
+            <nav class="navbar">
+                <div class="nav-brand">🔥 Akın Kombi</div>
+                <div class="nav-menu">
+                    <a href="#" data-page="dashboard" class="active">Dashboard</a>
+                    <a href="#" data-page="customers">Müşteriler</a>
+                    <a href="#" data-page="services">Servisler</a>
+                    <a href="#" data-page="inventory">Stok</a>
+                    <a href="#" data-page="financial">Finans</a>
+                </div>
+                <button id="logoutBtn" class="btn-logout">Çıkış</button>
+            </nav>
+
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page active">
+                    <h2>Dashboard</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Toplam Müşteri</h3>
+                            <p class="stat-value" id="totalCustomers">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Bekleyen Servisler</h3>
+                            <p class="stat-value" id="pendingServices">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Bugünkü Randevular</h3>
+                            <p class="stat-value" id="todayAppointments">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Aylık Gelir</h3>
+                            <p class="stat-value" id="monthlyRevenue">0 ₺</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Page -->
+                <div id="customersPage" class="page">
+                    <div class="page-header">
+                        <h2>Müşteriler</h2>
+                        <button class="btn-primary" onclick="showAddCustomer()">+ Yeni Müşteri</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Telefon</th>
+                                    <th>Adres</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Services Page -->
+                <div id="servicesPage" class="page">
+                    <div class="page-header">
+                        <h2>Servisler</h2>
+                        <button class="btn-primary" onclick="showAddService()">+ Yeni Servis</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="servicesTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Müşteri</th>
+                                    <th>Cihaz</th>
+                                    <th>Durum</th>
+                                    <th>Tarih</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inventory Page -->
+                <div id="inventoryPage" class="page">
+                    <div class="page-header">
+                        <h2>Stok Yönetimi</h2>
+                        <button class="btn-primary" onclick="showAddPart()">+ Yeni Parça</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Parça Adı</th>
+                                    <th>Stok</th>
+                                    <th>Fiyat</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Financial Page -->
+                <div id="financialPage" class="page">
+                    <h2>Finansal Yönetim</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Toplam Gelir</h3>
+                            <p class="stat-value" id="totalIncome">0 ₺</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Toplam Gider</h3>
+                            <p class="stat-value" id="totalExpense">0 ₺</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Net Kar</h3>
+                            <p class="stat-value" id="netProfit">0 ₺</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

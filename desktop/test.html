@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Bağlantı Testi</h1>
+    <button onclick="testLogin()">Login Test</button>
+    <button onclick="testCustomers()">Müşteriler Test</button>
+    <pre id="result"></pre>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3002/api/v1';
+        
+        async function testLogin() {
+            const result = document.getElementById('result');
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+                if (data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                }
+            } catch (err) {
+                result.textContent = 'Hata: ' + err.message;
+            }
+        }
+        
+        async function testCustomers() {
+            const result = document.getElementById('result');
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_BASE_URL}/customers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                result.textContent = 'Hata: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

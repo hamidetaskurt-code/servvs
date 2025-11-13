@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cihazlar - Akın Kombi</title>
+    <link rel="stylesheet" href="nova.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <div class="company-logo-container">
+                        <div class="company-logo">
+                            <div class="logo-icon">A</div>
+                        </div>
+                    </div>
+                    <div class="brand-text">
+                        <div class="company-name">
+                            <span class="company-name-text">SMART YAZILIM</span>
+                        </div>
+                        <div class="product-name">Akın Kombi</div>
+                        <div class="product-tagline">Servis Takip Sistemi</div>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalDevices">0</span>
+                        <span class="stat-label">Toplam</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="activeServices">0</span>
+                        <span class="stat-label">Aktif Servis</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="completedServices">0</span>
+                        <span class="stat-label">Tamamlanan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page-header">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"></path>
+                    </svg>
+                    Cihaz Listesi
+                </h2>
+                <button class="btn-primary" onclick="alert('Yeni cihaz ekleme özelliği yakında...')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Yeni Cihaz
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <p style="color: rgba(255,255,255,0.7); padding: 60px; text-align: center; font-size: 16px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: 0 auto 20px;">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"></path>
+                    </svg>
+                    Cihaz yönetimi özelliği yakında eklenecek...
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="notification" class="notification"><span id="notificationMessage"></span></div>
+    <div id="loading" class="loading"><div class="spinner"></div></div>
+    
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            localStorage.setItem('authToken', 'demo-token-12345');
+        }
+        
+        document.getElementById('totalDevices').textContent = '0';
+        document.getElementById('activeServices').textContent = '0';
+        document.getElementById('completedServices').textContent = '0';
+    </script>
+</body>
+</html>

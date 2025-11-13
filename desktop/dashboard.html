@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Akın Kombi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 10px; text-decoration: none; color: #fff; display: block; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); background: #334155; }
+        .card h2 { font-size: 24px; margin-bottom: 10px; }
+        .card p { color: #94a3b8; }
+        .logout { position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc2626; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button class="logout" onclick="logout()">Çıkış</button>
+    
+    <div class="container">
+        <h1>🏠 Akın Kombi - Ana Sayfa</h1>
+        
+        <div class="grid">
+            <a href="customers.html" class="card">
+                <h2>👥 Müşteriler</h2>
+                <p>Müşteri kayıtları ve yönetimi</p>
+            </a>
+
+            <a href="services.html" class="card">
+                <h2>🔧 Servisler</h2>
+                <p>Servis takibi ve yönetimi</p>
+            </a>
+
+            <a href="appointments.html" class="card">
+                <h2>📅 Randevular</h2>
+                <p>Randevu planlama ve takip</p>
+            </a>
+
+            <a href="technicians.html" class="card">
+                <h2>👷 Teknisyenler</h2>
+                <p>Teknisyen yönetimi</p>
+            </a>
+
+            <a href="inventory.html" class="card">
+                <h2>📦 Stok</h2>
+                <p>Envanter yönetimi</p>
+            </a>
+
+            <a href="financial.html" class="card">
+                <h2>💰 Finans</h2>
+                <p>Gelir-gider takibi</p>
+            </a>
+
+            <a href="reports.html" class="card">
+                <h2>📊 Raporlar</h2>
+                <p>Analiz ve raporlama</p>
+            </a>
+
+            <a href="communications.html" class="card">
+                <h2>💬 İletişim</h2>
+                <p>SMS, Email, WhatsApp</p>
+            </a>
+
+            <a href="settings.html" class="card">
+                <h2>⚙️ Ayarlar</h2>
+                <p>Sistem ayarları</p>
+            </a>
+
+            <a href="routing.html" class="card">
+                <h2>🗺️ Rota</h2>
+                <p>Rota optimizasyonu</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Token kontrolü
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

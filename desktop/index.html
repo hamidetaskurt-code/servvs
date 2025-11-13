@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akın Kombi - Yönetim Paneli</title>
+    <link rel="stylesheet" href="nova.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen" style="display: block;">
+            <div class="login-container">
+                <div class="logo">
+                    <h1>🔥 AKIN KOMBİ</h1>
+                    <p>Servis Yönetim Sistemi</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" id="username" required placeholder="demo">
+                    </div>
+                    <div class="form-group">
+                        <label>Şifre</label>
+                        <input type="password" id="password" required placeholder="demo">
+                    </div>
+                    <button type="submit" class="btn-primary">Giriş Yap</button>
+                    <p style="text-align: center; margin-top: 15px; color: #28a745; font-size: 14px; font-weight: bold;">
+                        ✅ Demo: <strong>demo / demo</strong>
+                    </p>
+                </form>
+                <div id="loginError" class="error"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="screen" style="display: none;">
+            <!-- NOVA Header -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div class="brand-section">
+                        <div class="company-logo">
+                            <div class="logo-icon">A</div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="company-name">
+                                <span class="company-name-text">AKIN KOMBİ</span>
+                            </div>
+                            <div class="product-name">Servis Yönetim</div>
+                            <div class="product-tagline">Kombi & Klima Servis Sistemi</div>
+                        </div>
+                    </div>
+                    <div class="header-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="headerTotalCustomers">0</span>
+                            <span class="stat-label">Müşteri</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="headerTotalServices">0</span>
+                            <span class="stat-label">Servis</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="headerTotalParts">0</span>
+                            <span class="stat-label">Parça</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR NAVIGATION -->
+            <div class="sidebar">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="customers">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path>
+                        </svg>
+                        <span>Müşteriler</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="services">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"></path>
+                        </svg>
+                        <span>Servisler</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="inventory">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        <span>Stok</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="financial">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"></path>
+                        </svg>
+                        <span>Finans</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="technicians">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Teknisyenler</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="appointments">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>Randevular</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="devices">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"></path>
+                        </svg>
+                        <span>Cihazlar</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="reports">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Raporlar</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.8-5.2l-4.2 4.2m0 6l4.2 4.2"></path>
+                        </svg>
+                        <span>Ayarlar</span>
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="#" class="nav-item nav-logout" id="sidebarLogoutBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Çıkış</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page active">
+                    <h2 class="section-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Dashboard
+                    </h2>
+                    <div class="stats-grid">
+                        <div class="dashboard-card primary">
+                            <div class="stat-icon">👥</div>
+                            <h3>Toplam Müşteri</h3>
+                            <p class="stat-value" id="totalCustomers">0</p>
+                        </div>
+                        <div class="dashboard-card warning">
+                            <div class="stat-icon">⏳</div>
+                            <h3>Bekleyen Servisler</h3>
+                            <p class="stat-value" id="pendingServices">0</p>
+                        </div>
+                        <div class="dashboard-card info">
+                            <div class="stat-icon">📅</div>
+                            <h3>Bugünkü Randevular</h3>
+                            <p class="stat-value" id="todayAppointments">0</p>
+                        </div>
+                        <div class="dashboard-card success">
+                            <div class="stat-icon">💰</div>
+                            <h3>Aylık Gelir</h3>
+                            <p class="stat-value" id="monthlyRevenue">0 ₺</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-row">
+                        <div class="dashboard-section">
+                            <h3>Son Servisler</h3>
+                            <div id="recentServices" class="recent-list"></div>
+                        </div>
+                        <div class="dashboard-section">
+                            <h3>Düşük Stok Uyarıları</h3>
+                            <div id="lowStockAlerts" class="recent-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Page -->
+                <div id="customersPage" class="page">
+                    <div class="page-header">
+                        <h2>Müşteriler</h2>
+                        <button class="btn-primary" onclick="showAddCustomer()">+ Yeni Müşteri</button>
+                    </div>
+                    <div class="search-filter-bar">
+                        <input type="text" id="customerSearch" placeholder="🔍 Müşteri ara..." oninput="searchCustomers()">
+                        <button class="btn btn-secondary" onclick="exportToExcel('customers')">Excel İndir</button>
+                        <div class="pagination-controls">
+                            <button onclick="previousPage('customers')" id="customerPrevBtn">«</button>
+                            <span id="customerPageInfo">1/1</span>
+                            <button onclick="nextPage('customers')" id="customerNextBtn">»</button>
+                            <select id="customerPageSize" onchange="changePageSize('customers')">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable('customers', 0)">ID ↕</th>
+                                    <th onclick="sortTable('customers', 1)">Ad Soyad ↕</th>
+                                    <th onclick="sortTable('customers', 2)">Telefon ↕</th>
+                                    <th onclick="sortTable('customers', 3)">Adres ↕</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Services Page -->
+                <div id="servicesPage" class="page">
+                    <div class="page-header">
+                        <h2>Servisler</h2>
+                        <button class="btn-primary" onclick="showAddService()">+ Yeni Servis</button>
+                    </div>
+                    <div class="search-filter-bar">
+                        <input type="text" id="serviceSearch" placeholder="🔍 Servis ara..." oninput="searchServices()">
+                        <select id="statusFilter" onchange="filterServices()">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="pending">Bekliyor</option>
+                            <option value="in_progress">İşlemde</option>
+                            <option value="completed">Tamamlandı</option>
+                            <option value="cancelled">İptal</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="exportToExcel('services')">Excel İndir</button>
+                        <div class="pagination-controls">
+                            <button onclick="previousPage('services')" id="servicePrevBtn">«</button>
+                            <span id="servicePageInfo">1/1</span>
+                            <button onclick="nextPage('services')" id="serviceNextBtn">»</button>
+                            <select id="servicePageSize" onchange="changePageSize('services')">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="servicesTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable('services', 0)">ID ↕</th>
+                                    <th onclick="sortTable('services', 1)">Müşteri ↕</th>
+                                    <th onclick="sortTable('services', 2)">Cihaz ↕</th>
+                                    <th onclick="sortTable('services', 3)">Durum ↕</th>
+                                    <th onclick="sortTable('services', 4)">Öncelik ↕</th>
+                                    <th onclick="sortTable('services', 5)">Teknisyen ↕</th>
+                                    <th onclick="sortTable('services', 6)">Tarih ↕</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inventory Page -->
+                <div id="inventoryPage" class="page">
+                    <div class="page-header">
+                        <h2>Stok Yönetimi</h2>
+                        <button class="btn-primary" onclick="showAddPart()">+ Yeni Parça</button>
+                    </div>
+                    <div class="search-filter-bar">
+                        <input type="text" id="partSearch" placeholder="🔍 Parça ara..." oninput="searchParts()">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="lowStockFilter" onchange="filterLowStock()">
+                            Sadece Düşük Stok
+                        </label>
+                        <button class="btn btn-secondary" onclick="exportToExcel('inventory')">Excel İndir</button>
+                        <div class="pagination-controls">
+                            <button onclick="previousPage('inventory')" id="inventoryPrevBtn">«</button>
+                            <span id="inventoryPageInfo">1/1</span>
+                            <button onclick="nextPage('inventory')" id="inventoryNextBtn">»</button>
+                            <select id="inventoryPageSize" onchange="changePageSize('inventory')">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable('inventory', 0)">ID ↕</th>
+                                    <th onclick="sortTable('inventory', 1)">Parça Adı ↕</th>
+                                    <th onclick="sortTable('inventory', 2)">Stok ↕</th>
+                                    <th onclick="sortTable('inventory', 3)">Fiyat ↕</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Financial Page -->
+                <div id="financialPage" class="page">
+                    <div class="page-header">
+                        <h2>Finansal Yönetim</h2>
+                        <div>
+                            <button class="btn-primary" onclick="showAddPayment()" style="margin-right: 10px;">💵 Ödeme Ekle</button>
+                            <button class="btn btn-secondary" onclick="showAddExpense()">💸 Gider Ekle</button>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="dashboard-card success">
+                            <div class="stat-icon">💵</div>
+                            <h3>Toplam Gelir</h3>
+                            <p class="stat-value" id="totalIncome">0 ₺</p>
+                        </div>
+                        <div class="dashboard-card danger">
+                            <div class="stat-icon">💸</div>
+                            <h3>Toplam Gider</h3>
+                            <p class="stat-value" id="totalExpense">0 ₺</p>
+                        </div>
+                        <div class="dashboard-card primary">
+                            <div class="stat-icon">📊</div>
+                            <h3>Net Kar</h3>
+                            <p class="stat-value" id="netProfit">0 ₺</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-row">
+                        <div class="dashboard-section">
+                            <h3>Son Ödemeler</h3>
+                            <div id="recentPayments" class="recent-list"></div>
+                        </div>
+                        <div class="dashboard-section">
+                            <h3>Son Giderler</h3>
+                            <div id="recentExpenses" class="recent-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notificationMessage"></span>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Müşteri Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('customerModal')">&times;</span>
+                <h2 id="customerModalTitle">Yeni Müşteri</h2>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm">
+                    <input type="hidden" id="customerId" name="customer_id">
+                    <div class="form-row">
+                        <label>Ad *</label>
+                        <input type="text" name="first_name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Soyad *</label>
+                        <input type="text" name="last_name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Telefon *</label>
+                        <input type="tel" name="phone" required placeholder="0532 123 4567">
+                    </div>
+                    <div class="form-row">
+                        <label>E-posta</label>
+                        <input type="email" name="email" placeholder="ornek@email.com">
+                    </div>
+                    <div class="form-row">
+                        <label>Adres</label>
+                        <textarea name="address" placeholder="Tam adres..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('customerModal')">İptal</button>
+                <button type="submit" form="customerForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servis Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('serviceModal')">&times;</span>
+                <h2 id="serviceModalTitle">Yeni Servis</h2>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm">
+                    <input type="hidden" id="serviceId" name="service_id">
+                    <div class="form-row">
+                        <label>Müşteri *</label>
+                        <select name="customer_id" required>
+                            <option value="">Müşteri Seçin</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Cihaz Tipi *</label>
+                        <input type="text" name="device_type" required placeholder="Kombi, Klima, vb.">
+                    </div>
+                    <div class="form-row">
+                        <label>Marka</label>
+                        <input type="text" name="brand" placeholder="Vaillant, Baymak, vb.">
+                    </div>
+                    <div class="form-row">
+                        <label>Model</label>
+                        <input type="text" name="model">
+                    </div>
+                    <div class="form-row">
+                        <label>Sorun Açıklaması *</label>
+                        <textarea name="problem_description" required placeholder="Müşterinin bildirdiği sorun..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Yapılan İşlem</label>
+                        <textarea name="work_done" placeholder="Teknisyenin yaptığı işlemler..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Kullanılan Parçalar</label>
+                        <textarea name="parts_used" placeholder="Değiştirilen veya kullanılan parçalar..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Durum</label>
+                        <select name="status">
+                            <option value="pending">Bekliyor</option>
+                            <option value="in_progress">İşlemde</option>
+                            <option value="completed">Tamamlandı</option>
+                            <option value="cancelled">İptal</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Öncelik</label>
+                        <select name="priority">
+                            <option value="low">Düşük</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="high">Yüksek</option>
+                            <option value="urgent">Acil</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Teknisyen</label>
+                        <input type="text" name="assigned_technician" placeholder="Atanan teknisyen adı">
+                    </div>
+                    <div class="form-row">
+                        <label>İşçilik Ücreti (₺)</label>
+                        <input type="number" name="labor_cost" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-row">
+                        <label>Parça Maliyeti (₺)</label>
+                        <input type="number" name="parts_cost" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-row">
+                        <label>Toplam Maliyet (₺)</label>
+                        <input type="number" name="total_cost" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-row">
+                        <label>Randevu Tarihi</label>
+                        <input type="date" name="scheduled_date">
+                    </div>
+                    <div class="form-row">
+                        <label>Tamamlanma Tarihi</label>
+                        <input type="date" name="completed_date">
+                    </div>
+                    <div class="form-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="is_warranty">
+                            Garanti Kapsamında
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('serviceModal')">İptal</button>
+                <button type="submit" form="serviceForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ödeme Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('paymentModal')">&times;</span>
+                <h2>Ödeme Ekle</h2>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm">
+                    <div class="form-row">
+                        <label>Tutar (₺) *</label>
+                        <input type="number" name="amount" required min="0" step="0.01">
+                    </div>
+                    <div class="form-row">
+                        <label>Ödeme Yöntemi</label>
+                        <select name="payment_method">
+                            <option value="cash">Nakit</option>
+                            <option value="credit_card">Kredi Kartı</option>
+                            <option value="bank_transfer">Havale</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Tarih *</label>
+                        <input type="date" name="payment_date" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Açıklama</label>
+                        <textarea name="description" placeholder="Ödeme hakkında notlar..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('paymentModal')">İptal</button>
+                <button type="submit" form="paymentForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gider Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('expenseModal')">&times;</span>
+                <h2>Gider Ekle</h2>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <div class="form-row">
+                        <label>Açıklama *</label>
+                        <input type="text" name="description" required placeholder="Gider açıklaması">
+                    </div>
+                    <div class="form-row">
+                        <label>Tutar (₺) *</label>
+                        <input type="number" name="amount" required min="0" step="0.01">
+                    </div>
+                    <div class="form-row">
+                        <label>Kategori</label>
+                        <select name="category">
+                            <option value="parts">Parça</option>
+                            <option value="salary">Maaş</option>
+                            <option value="rent">Kira</option>
+                            <option value="utilities">Faturalar</option>
+                            <option value="other">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Tarih *</label>
+                        <input type="date" name="expense_date" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')">İptal</button>
+                <button type="submit" form="expenseForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Müşteri Detay Modal -->
+    <div id="customerDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('customerDetailModal')">&times;</span>
+                <h2>Müşteri Detayları</h2>
+            </div>
+            <div class="modal-body">
+                <div id="customerDetailContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('customerDetailModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stok Modal -->
+    <div id="partModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeModal('partModal')">&times;</span>
+                <h2 id="partModalTitle">Yeni Parça</h2>
+            </div>
+            <div class="modal-body">
+                <form id="partForm">
+                    <input type="hidden" id="partId" name="part_id">
+                    <div class="form-row">
+                        <label>Parça Adı *</label>
+                        <input type="text" name="part_name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Parça Numarası</label>
+                        <input type="text" name="part_number">
+                    </div>
+                    <div class="form-row">
+                        <label>Stok Miktarı *</label>
+                        <input type="number" name="stock_quantity" required min="0">
+                    </div>
+                    <div class="form-row">
+                        <label>Birim Fiyat (₺) *</label>
+                        <input type="number" name="unit_price" required min="0" step="0.01">
+                    </div>
+                    <div class="form-row">
+                        <label>Minimum Stok Seviyesi</label>
+                        <input type="number" name="min_stock_level" min="0">
+                    </div>
+                    <div class="form-row">
+                        <label>Açıklama</label>
+                        <textarea name="description"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('partModal')">İptal</button>
+                <button type="submit" form="partForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

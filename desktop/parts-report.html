@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parça Kullanım Raporu - Akın Kombi</title>
+    <link rel="stylesheet" href="nova.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <div class="company-logo-container">
+                        <div class="company-logo">
+                            <div class="logo-icon">A</div>
+                        </div>
+                    </div>
+                    <div class="brand-text">
+                        <div class="company-name">
+                            <span class="company-name-text">SMART YAZILIM</span>
+                        </div>
+                        <div class="product-name">Akın Kombi</div>
+                        <div class="product-tagline">Servis Takip Sistemi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page-header">
+                <button class="btn-back" onclick="window.location.href='reports.html'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Raporlar
+                </button>
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H5m13.2 5.2l-4.2-4.2m0-6l4.2-4.2"></path>
+                    </svg>
+                    Parça Kullanım Raporu
+                </h2>
+                <button class="btn-primary" onclick="window.print()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Yazdır
+                </button>
+            </div>
+
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="dashboard-card primary">
+                    <div class="card-header">
+                        <h3>Toplam Kullanım</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stat-value" id="totalUsage">0</div>
+                        <p>Parça Adedi</p>
+                    </div>
+                </div>
+                <div class="dashboard-card success">
+                    <div class="card-header">
+                        <h3>Toplam Değer</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stat-value" id="totalValue">0 ₺</div>
+                        <p>Kullanılan Parça</p>
+                    </div>
+                </div>
+                <div class="dashboard-card warning">
+                    <div class="card-header">
+                        <h3>En Çok Kullanılan</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="stat-value" id="topPart">-</div>
+                        <p>Parça Adı</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 style="margin-bottom: 20px; color: #1e293b;">📦 Parça Kullanım Detayları</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parça Adı</th>
+                            <th>Kullanım Sayısı</th>
+                            <th>Toplam Miktar</th>
+                            <th>Birim Fiyat</th>
+                            <th>Toplam Değer</th>
+                            <th>Mevcut Stok</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partsUsageTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function loadPartsUsage() {
+            const serviceParts = JSON.parse(localStorage.getItem('demo_service_parts') || '[]');
+            const inventory = JSON.parse(localStorage.getItem('demo_inventory') || '[]');
+            
+            const partStats = {};
+            serviceParts.forEach(sp => {
+                if (!partStats[sp.part_id]) {
+                    partStats[sp.part_id] = {
+                        count: 0,
+                        totalQty: 0,
+                        totalValue: 0,
+                        unitPrice: sp.unit_price
+                    };
+                }
+                partStats[sp.part_id].count++;
+                partStats[sp.part_id].totalQty += sp.quantity;
+                partStats[sp.part_id].totalValue += sp.total_price;
+            });
+            
+            let totalUsage = 0;
+            let totalValue = 0;
+            let topPartId = null;
+            let maxCount = 0;
+            
+            Object.keys(partStats).forEach(partId => {
+                totalUsage += partStats[partId].totalQty;
+                totalValue += partStats[partId].totalValue;
+                if (partStats[partId].count > maxCount) {
+                    maxCount = partStats[partId].count;
+                    topPartId = partId;
+                }
+            });
+            
+            document.getElementById('totalUsage').textContent = totalUsage;
+            document.getElementById('totalValue').textContent = totalValue.toFixed(2) + ' ₺';
+            
+            if (topPartId) {
+                const topPart = inventory.find(p => p.id == topPartId);
+                document.getElementById('topPart').textContent = topPart ? topPart.part_name : '-';
+            }
+            
+            const tableHtml = Object.keys(partStats).map(partId => {
+                const part = inventory.find(p => p.id == partId);
+                const stats = partStats[partId];
+                return `<tr>
+                    <td><strong>${part ? part.part_name : 'Bilinmeyen'}</strong></td>
+                    <td>${stats.count}</td>
+                    <td>${stats.totalQty}</td>
+                    <td>${stats.unitPrice.toFixed(2)} ₺</td>
+                    <td><strong>${stats.totalValue.toFixed(2)} ₺</strong></td>
+                    <td><span class="status-badge ${part && part.stock_quantity <= 10 ? 'status-cancelled' : 'status-completed'}">${part ? part.stock_quantity : 0}</span></td>
+                </tr>`;
+            }).join('');
+            
+            document.getElementById('partsUsageTable').innerHTML = tableHtml || '<tr><td colspan="6" style="text-align: center; color: #999;">Henüz parça kullanımı yok</td></tr>';
+        }
+
+        window.addEventListener('DOMContentLoaded', loadPartsUsage);
+    </script>
+</body>
+</html>

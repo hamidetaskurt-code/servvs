@@ -1,0 +1,90 @@
+# AWS CLI Kurulum Talimatları
+
+## Adım 1: AWS Console'dan Access Key Oluştur
+
+1. https://console.aws.amazon.com adresine git
+2. Email: hamidetaskurt@gmail.com ile giriş yap
+3. Üst arama çubuğuna "IAM" yaz
+4. Sol menüden "Users" seç
+5. Kullanıcı adını seç (veya yeni kullanıcı oluştur)
+6. "Security credentials" sekmesine git
+7. "Create access key" butonuna tıkla
+8. "Command Line Interface (CLI)" seç
+9. Access Key ID ve Secret Access Key'i kaydet
+
+## Adım 2: Credentials Dosyasını Oluştur
+
+### Yöntem 1: Komut ile (Önerilen)
+
+PowerShell'de şu komutu çalıştır:
+
+```powershell
+aws configure
+```
+
+Sorulan bilgileri gir:
+- AWS Access Key ID: [AWS Console'dan aldığın]
+- AWS Secret Access Key: [AWS Console'dan aldığın]
+- Default region name: us-east-1
+- Default output format: json
+
+### Yöntem 2: Manuel Dosya Oluşturma
+
+1. Bu dosyayı oluştur: C:\Users\mel\.aws\credentials
+
+İçeriği:
+```
+[default]
+aws_access_key_id = YOUR_ACCESS_KEY_ID_HERE
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY_HERE
+```
+
+2. Bu dosyayı oluştur: C:\Users\mel\.aws\config
+
+İçeriği:
+```
+[default]
+region = us-east-1
+output = json
+```
+
+## Adım 3: Test Et
+
+```powershell
+aws sts get-caller-identity
+```
+
+Başarılı olursa şunu göreceksin:
+```json
+{
+    "UserId": "...",
+    "Account": "270928328231",
+    "Arn": "..."
+}
+```
+
+## Adım 4: RDS ve EC2'yi Test Et
+
+```powershell
+# RDS instance'ları listele
+aws rds describe-db-instances
+
+# EC2 instance'ları listele
+aws ec2 describe-instances
+
+# S3 bucket'ları listele
+aws s3 ls
+```
+
+## Güvenlik Notları
+
+⚠️ Access Key'leri:
+- Asla kimseyle paylaşma
+- Git'e commit etme
+- Public yerlere yazma
+- Düzenli olarak rotate et (değiştir)
+
+✅ Güvenli kullanım:
+- Sadece lokal bilgisayarında sakla
+- .gitignore'a ekle
+- IAM kullanıcısına minimum gerekli izinleri ver

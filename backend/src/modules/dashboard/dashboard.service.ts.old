@@ -1,0 +1,135 @@
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+
+@Injectable()
+export class DashboardService {
+  constructor(
+    @InjectDataSource()
+    private dataSource: DataSource,
+  ) {}
+
+  async getStats() {
+    // Bugünkü servisler
+    const todayServices = await this.dataSource.query(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
+        COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
+        COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled
+      FROM services 
+      WHERE service_date = CURRENT_DATE
+    `);
+
+    // Aktif teknisyenler
+    const activeTechnicians = await this.dataSource.query(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active
+      FROM technicians 
+      WHERE status IN ('active', 'on_leave')
+    `);
+
+    // Bekleyen randevular
+    const pendingAppointments = await this.dataSource.query(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN appointment_date = CURRENT_DATE THEN 1 END) as today,
+        COUNT(CASE WHEN appointment_date = CURRENT_DATE + 1 THEN 1 END) as tomorrow
+      FROM appointments 
+      WHERE status IN ('pending', 'confirmed')
+    `);
+
+    // Kritik stoklar
+    const criticalStock = await this.dataSource.query(`
+      SELECT COUNT(*) as count
+      FROM parts 
+      WHERE minimum_stock > 0 
+      AND (
+        SELECT COALESCE(SUM(quantity), 0) 
+        FROM stock_movements 
+        WHERE part_id = parts.part_id
+      ) <= minimum_stock
+    `);
+
+    // Günlük gelir
+    const dailyRevenue = await this.dataSource.query(`
+      SELECT 
+        COALESCE(SUM(amount), 0) as total,
+        COALESCE(SUM(CASE WHEN payment_method = 'cash' THEN amount ELSE 0 END), 0) as cash,
+        COALESCE(SUM(CASE WHEN payment_method = 'card' THEN amount ELSE 0 END), 0) as card
+      FROM payments_received 
+      WHERE payment_date = CURRENT_DATE
+    `);
+
+    // Müşteri memnuniyeti
+    const satisfaction = await this.dataSource.query(`
+      SELECT COALESCE(AVG(customer_rating), 0) as average
+      FROM services 
+      WHERE customer_rating IS NOT NULL 
+      AND service_date >= CURRENT_DATE - INTERVAL '30 days'
+    `);
+
+    return {
+      todayServices: {
+        total: parseInt(todayServices[0]?.total || 0),
+        completed: parseInt(todayServices[0]?.completed || 0),
+        inProgress: parseInt(todayServices[0]?.in_progress || 0),
+        cancelled: parseInt(todayServices[0]?.cancelled || 0),
+      },
+      technicians: {
+        total: parseInt(activeTechnicians[0]?.total || 0),
+        active: parseInt(activeTechnicians[0]?.active || 0),
+      },
+      appointments: {
+        total: parseInt(pendingAppointments[0]?.total || 0),
+        today: parseInt(pendingAppointments[0]?.today || 0),
+        tomorrow: parseInt(pendingAppointments[0]?.tomorrow || 0),
+      },
+      criticalStock: parseInt(criticalStock[0]?.count || 0),
+      revenue: {
+        total: parseFloat(dailyRevenue[0]?.total || 0),
+        cash: parseFloat(dailyRevenue[0]?.cash || 0),
+        card: parseFloat(dailyRevenue[0]?.card || 0),
+      },
+      satisfaction: parseFloat(satisfaction[0]?.average || 0).toFixed(1),
+    };
+  }
+
+  async getRecentActivities() {
+    const activities = await this.dataSource.query(`
+      SELECT 
+        'service' as type,
+        s.service_id as id,
+        s.status,
+        s.created_at as timestamp,
+        t.first_name || ' ' || t.last_name as technician_name,
+        c.first_name || ' ' || c.last_name as customer_name
+      FROM services s
+      LEFT JOIN technicians t ON s.technician_id = t.technician_id
+      LEFT JOIN customers c ON s.customer_id = c.customer_id
+      WHERE s.created_at >= CURRENT_TIMESTAMP - INTERVAL '2 hours'
+      ORDER BY s.created_at DESC
+      LIMIT 10
+    `);
+
+    return activities.map(activity => ({
+      type: activity.type,
+      id: activity.id,
+      status: activity.status,
+      timestamp: activity.timestamp,
+      message: this.formatActivityMessage(activity),
+    }));
+  }
+
+  private formatActivityMessage(activity: any): string {
+    if (activity.type === 'service') {
+      if (activity.status === 'in_progress') {
+        return `${activity.technician_name} → Servise başladı (#S-${activity.id})`;
+      } else if (activity.status === 'completed') {
+        return `${activity.technician_name} → Servis tamamlandı (#S-${activity.id})`;
+      }
+    }
+    return 'Aktivite';
+  }
+}

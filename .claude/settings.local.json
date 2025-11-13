@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-ChildItem -Recurse -Force | Select-Object -Property @{Name=''''Path'''';Expression={$_ullName.Replace($PWD.Path, '''''''')}} | Sort-Object Path | Format-Table -AutoSize\")",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run start:dev:*)",
+      "Bash(powershell -Command \"(Get-Content ''proje.md'' | Measure-Object -Line).Lines\")",
+      "Bash(npm rebuild:*)",
+      "Bash(npm install:*)",
+      "mcp__gemini-collab__gemini_analyze_task",
+      "mcp__gemini-collab__gemini_summarize",
+      "mcp__gemini-collab__gemini_code_review",
+      "mcp__gemini-collab__gemini_code_scaffold",
+      "mcp__gemini-collab__get_token_optimization_guide"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

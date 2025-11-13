@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Optimizasyonu - Akın Kombi</title>
+    
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 380px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .sidebar-header h1 {
+            font-size: 24px;
+            color: #111827;
+            margin: 0;
+        }
+        .sidebar-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .controls {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .control-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        .control-group input, .control-group select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .service-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        .service-list h3 {
+            padding: 0 20px 10px;
+            font-size: 16px;
+            color: #111827;
+        }
+        .service-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .service-item-order {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2563eb;
+            width: 24px;
+            text-align: center;
+        }
+        .service-item-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .service-item-details p {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 2px 0 0;
+        }
+        .map-container {
+            flex-grow: 1;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            background-color: #e5e7eb;
+        }
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Rota Optimizasyonu</h1>
+            <p>AI Destekli Günlük Rota Planlama</p>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="routeDate">Tarih</label>
+                <input type="date" id="routeDate">
+            </div>
+            <div class="control-group">
+                <label for="technicianSelect">Teknisyen</label>
+                <select id="technicianSelect">
+                    <option value="">Teknisyen Seçin</option>
+                    <!-- Teknisyenler buraya yüklenecek -->
+                </select>
+            </div>
+            <button class="btn btn-primary" id="fetchServicesBtn">Servisleri Getir</button>
+            <button class="btn btn-secondary" id="optimizeRouteBtn" disabled>Rotayı Optimize Et</button>
+        </div>
+        <div class="service-list" id="serviceListContainer">
+            <h3>Planlanacak Servisler</h3>
+            <div class="empty-state">Lütfen tarih ve teknisyen seçip servisleri getirin.</div>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Leaflet.js JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Haritayı İstanbul merkezli başlat
+            const map = L.map('map').setView([41.0082, 28.9784], 10);
+
+            // OpenStreetMap tile katmanını ekle
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            // Butonları ve diğer elementleri seç
+            const fetchBtn = document.getElementById('fetchServicesBtn');
+            const optimizeBtn = document.getElementById('optimizeRouteBtn');
+            const serviceListContainer = document.getElementById('serviceListContainer');
+            const technicianSelect = document.getElementById('technicianSelect');
+            const routeDate = document.getElementById('routeDate');
+
+            // Tarih alanını bugünün tarihi ile doldur
+            routeDate.valueAsDate = new Date();
+
+            // Örnek Teknisyenleri Yükle (Normalde API'den gelir)
+            const technicians = [
+                { id: 1, name: 'Ali Yılmaz', startLat: 41.05, startLon: 29.00 },
+                { id: 2, name: 'Veli Kaya', startLat: 40.98, startLon: 29.05 }
+            ];
+            technicians.forEach(tech => {
+                const option = document.createElement('option');
+                option.value = tech.id;
+                option.textContent = tech.name;
+                technicianSelect.appendChild(option);
+            });
+
+            // Servisleri Getir Butonu Olayı
+            fetchBtn.addEventListener('click', async () => {
+                const selectedTechId = technicianSelect.value;
+                const selectedDate = routeDate.value;
+
+                if (!selectedTechId || !selectedDate) {
+                    alert('Lütfen tarih ve teknisyen seçin.');
+                    return;
+                }
+
+                serviceListContainer.innerHTML = '<div class="loading-state">Servisler yükleniyor...</div>';
+                
+                // ÖRNEK VERİ: Normalde bu veri API'den gelir
+                // GET /api/v1/services?technicianId=${selectedTechId}&date=${selectedDate}
+                const services = [
+                    { id: 101, customer: 'Ayşe Demir', address: 'Beşiktaş, İstanbul', lat: 41.043, lon: 29.002 },
+                    { id: 102, customer: 'Fatma Öztürk', address: 'Kadıköy, İstanbul', lat: 40.991, lon: 29.028 },
+                    { id: 103, customer: 'Hasan Çelik', address: 'Şişli, İstanbul', lat: 41.063, lon: 28.987 },
+                    { id: 104, customer: 'Mehmet Aydın', address: 'Üsküdar, İstanbul', lat: 41.025, lon: 29.017 },
+                    { id: 105, customer: 'Zeynep Arslan', address: 'Bakırköy, İstanbul', lat: 40.983, lon: 28.870 }
+                ];
+
+                // Haritadaki eski markerları temizle
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                // Servis listesini ve harita markerlarını oluştur
+                let serviceHtml = '<h3>Planlanacak Servisler</h3>';
+                const bounds = [];
+                services.forEach(service => {
+                    serviceHtml += `
+                        <div class="service-item" data-service-id="${service.id}">
+                            <input type="checkbox" checked>
+                            <div class="service-item-details">
+                                <h4>${service.customer}</h4>
+                                <p>${service.address}</p>
+                            </div>
+                        </div>
+                    `;
+                    const marker = L.marker([service.lat, service.lon]).addTo(map)
+                        .bindPopup(`<b>${service.customer}</b><br>${service.address}`);
+                    bounds.push([service.lat, service.lon]);
+                });
+
+                serviceListContainer.innerHTML = serviceHtml;
+                
+                // Haritayı tüm servisleri gösterecek şekilde ayarla
+                if(bounds.length > 0) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+
+                optimizeBtn.disabled = false;
+            });
+
+            // Rota Optimizasyonu Butonu Olayı
+            optimizeBtn.addEventListener('click', async () => {
+                const selectedTechId = technicianSelect.value;
+                const techData = technicians.find(t => t.id == selectedTechId);
+
+                if (!techData) {
+                    alert('Lütfen geçerli bir teknisyen seçin.');
+                    return;
+                }
+
+                const checkedServiceElements = document.querySelectorAll('.service-item input[type="checkbox"]:checked');
+                const servicesToOptimize = Array.from(checkedServiceElements).map(el => {
+                    const serviceItem = el.closest('.service-item');
+                    const serviceId = parseInt(serviceItem.dataset.serviceId);
+                    const serviceData = services.find(s => s.id === serviceId);
+                    return {
+                        id: serviceData.id,
+                        lat: serviceData.lat,
+                        lon: serviceData.lon
+                    };
+                });
+
+                if (servicesToOptimize.length === 0) {
+                    alert('Lütfen optimize edilecek en az bir servis seçin.');
+                    return;
+                }
+
+                const payload = {
+                    technician: {
+                        startLat: techData.startLat,
+                        startLon: techData.startLon
+                    },
+                    services: servicesToOptimize
+                };
+
+                try {
+                    optimizeBtn.textContent = 'Optimize Ediliyor...';
+                    optimizeBtn.disabled = true;
+
+                    // API_BASE_URL'i projenizin gerçek adresine göre ayarlayın
+                    const API_BASE_URL = 'http://localhost:3002/api/v1';
+                    const response = await fetch(`${API_BASE_URL}/route-optimization/optimize`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.message || 'Optimizasyon sırasında bir hata oluştu.');
+                    }
+
+                    const result = await response.json();
+                    
+                    // Mevcut rota çizimlerini temizle
+                    map.eachLayer(layer => {
+                        if (layer instanceof L.Polyline) {
+                            map.removeLayer(layer);
+                        }
+                    });
+
+                    // Optimize edilmiş rotayı haritada çiz
+                    const routeCoordinates = [
+                        [techData.startLat, techData.startLon],
+                        ...result.optimizedRoute.map(s => [s.lat, s.lon])
+                    ];
+                    const polyline = L.polyline(routeCoordinates, { color: '#2563eb', weight: 5 }).addTo(map);
+                    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+
+                    // Servis listesini yeniden sırala
+                    updateServiceListOrder(result.optimizedRoute);
+
+                    alert(`Rota başarıyla optimize edildi! Toplam Mesafe: ${result.totalDistance} km.`);
+
+                } catch (error) {
+                    alert('Hata: ' + error.message);
+                } finally {
+                    optimizeBtn.textContent = 'Rotayı Optimize Et';
+                    optimizeBtn.disabled = false;
+                }
+            });
+
+            function updateServiceListOrder(optimizedRoute) {
+                let serviceHtml = '<h3>Optimize Edilmiş Rota</h3>';
+                optimizedRoute.forEach(routeItem => {
+                    const serviceData = services.find(s => s.id === routeItem.serviceId);
+                    if (serviceData) {
+                        serviceHtml += `
+                            <div class="service-item" data-service-id="${serviceData.id}">
+                                <span class="service-item-order">${routeItem.order}.</span>
+                                <div class="service-item-details">
+                                    <h4>${serviceData.customer}</h4>
+                                    <p>${serviceData.address} (+${routeItem.distanceKm} km)</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                serviceListContainer.innerHTML = serviceHtml;
+            }
+
+            // Global services değişkeni
+            let services = [];
+        });
+    </script>
+
+</body>
+</html>

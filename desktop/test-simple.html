@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        pre { background: #f0f0f0; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Sistem Test</h1>
+    
+    <h2>1. Backend Test</h2>
+    <button onclick="testBackend()">Backend Test</button>
+    <pre id="backendResult"></pre>
+
+    <h2>2. Login Test</h2>
+    <button onclick="testLogin()">Login Test</button>
+    <pre id="loginResult"></pre>
+
+    <h2>3. Müşteriler Test</h2>
+    <button onclick="testCustomers()">Müşteriler Test</button>
+    <pre id="customersResult"></pre>
+
+    <h2>4. Sayfa Linkleri</h2>
+    <a href="dashboard.html">Dashboard</a> |
+    <a href="customers.html">Müşteriler</a> |
+    <a href="technicians.html">Teknisyenler</a> |
+    <a href="services.html">Servisler</a>
+
+    <script>
+        const API = 'http://localhost:3002/api/v1';
+
+        async function testBackend() {
+            const result = document.getElementById('backendResult');
+            try {
+                const res = await fetch(`${API}/health`);
+                const data = await res.json();
+                result.textContent = '✅ Backend çalışıyor: ' + JSON.stringify(data);
+            } catch (err) {
+                result.textContent = '❌ Hata: ' + err.message;
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            try {
+                const res = await fetch(`${API}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                const data = await res.json();
+                if (data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                    result.textContent = '✅ Login başarılı! Token kaydedildi.';
+                } else {
+                    result.textContent = '❌ Login başarısız: ' + JSON.stringify(data);
+                }
+            } catch (err) {
+                result.textContent = '❌ Hata: ' + err.message;
+            }
+        }
+
+        async function testCustomers() {
+            const result = document.getElementById('customersResult');
+            const token = localStorage.getItem('token');
+            if (!token) {
+                result.textContent = '❌ Önce login yapın!';
+                return;
+            }
+            try {
+                const res = await fetch(`${API}/customers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                result.textContent = '✅ Müşteriler: ' + JSON.stringify(data, null, 2);
+            } catch (err) {
+                result.textContent = '❌ Hata: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

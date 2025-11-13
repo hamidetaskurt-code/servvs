@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teknisyen Performans - Akın Kombi</title>
+    <link rel="stylesheet" href="nova.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <div class="company-logo-container">
+                        <div class="company-logo">
+                            <div class="logo-icon">A</div>
+                        </div>
+                    </div>
+                    <div class="brand-text">
+                        <div class="company-name">
+                            <span class="company-name-text">SMART YAZILIM</span>
+                        </div>
+                        <div class="product-name">Akın Kombi</div>
+                        <div class="product-tagline">Servis Takip Sistemi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="page-header">
+                <button class="btn-back" onclick="window.location.href='reports.html'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Raporlar
+                </button>
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <polyline points="17 11 19 13 23 9"></polyline>
+                    </svg>
+                    Teknisyen Performans Raporu
+                </h2>
+                <button class="btn-primary" onclick="window.print()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Yazdır
+                </button>
+            </div>
+
+            <div id="technicianCards" class="stats-grid" style="margin-bottom: 30px;"></div>
+
+            <div class="table-container">
+                <h3 style="margin-bottom: 20px; color: #1e293b;">📊 Detaylı Performans Tablosu</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Teknisyen</th>
+                            <th>Toplam İş</th>
+                            <th>Tamamlanan</th>
+                            <th>Devam Eden</th>
+                            <th>Başarı Oranı</th>
+                            <th>Toplam Gelir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="performanceTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function loadTechnicianPerformance() {
+            const technicians = JSON.parse(localStorage.getItem('demo_technicians') || '[]');
+            const services = JSON.parse(localStorage.getItem('demo_services') || '[]');
+            
+            const cardsHtml = technicians.map(tech => {
+                const techServices = services.filter(s => s.technician_id === tech.id);
+                const completed = techServices.filter(s => s.status === 'completed' || s.status === 'paid').length;
+                const ongoing = techServices.filter(s => s.status === 'assigned').length;
+                const totalRevenue = techServices.reduce((sum, s) => sum + (s.total_cost || 0), 0);
+                
+                return `
+                    <div class="dashboard-card primary">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <h3>${tech.name}</h3>
+                        </div>
+                        <div class="card-content">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                                <div><strong>${techServices.length}</strong><br><small>Toplam İş</small></div>
+                                <div><strong>${completed}</strong><br><small>Tamamlanan</small></div>
+                                <div><strong>${ongoing}</strong><br><small>Devam Eden</small></div>
+                                <div><strong>${totalRevenue.toFixed(0)} ₺</strong><br><small>Gelir</small></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('technicianCards').innerHTML = cardsHtml;
+            
+            const tableHtml = technicians.map(tech => {
+                const techServices = services.filter(s => s.technician_id === tech.id);
+                const completed = techServices.filter(s => s.status === 'completed' || s.status === 'paid').length;
+                const ongoing = techServices.filter(s => s.status === 'assigned').length;
+                const successRate = techServices.length > 0 ? ((completed / techServices.length) * 100).toFixed(1) : 0;
+                const totalRevenue = techServices.reduce((sum, s) => sum + (s.total_cost || 0), 0);
+                
+                return `<tr>
+                    <td><strong>${tech.name}</strong></td>
+                    <td>${techServices.length}</td>
+                    <td>${completed}</td>
+                    <td>${ongoing}</td>
+                    <td><span class="status-badge ${successRate >= 70 ? 'status-completed' : 'status-pending'}">${successRate}%</span></td>
+                    <td><strong>${totalRevenue.toFixed(2)} ₺</strong></td>
+                </tr>`;
+            }).join('');
+            document.getElementById('performanceTable').innerHTML = tableHtml || '<tr><td colspan="6" style="text-align: center; color: #999;">Veri bulunamadı</td></tr>';
+        }
+
+        window.addEventListener('DOMContentLoaded', loadTechnicianPerformance);
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# AWS Config Dosyası Şablonu
+# Bu dosyayı C:\Users\mel\.aws\config konumuna kaydet
+
+[default]
+region = us-east-1
+output = json
