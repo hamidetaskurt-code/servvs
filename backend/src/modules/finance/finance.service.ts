@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, LessThan } from 'typeorm';
+import { Repository, Between, LessThan, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Invoice } from './entities/invoice.entity';
 import { Payment } from './entities/payment.entity';
+import { Installment } from './entities/installment.entity';
 import { PaymentStatus } from '../../common/enums/payment-status.enum';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateInstallmentPlanDto } from './dto/create-installment-plan.dto';
+import { CommunicationsService } from '../communications/communications.service';
 
 @Injectable()
 export class FinanceService {
@@ -14,6 +17,9 @@ export class FinanceService {
     private invoicesRepository: Repository<Invoice>,
     @InjectRepository(Payment)
     private paymentsRepository: Repository<Payment>,
+    @InjectRepository(Installment)
+    private installmentsRepository: Repository<Installment>,
+    private communicationsService: CommunicationsService,
   ) {}
 
   // Fatura numarası oluştur
@@ -282,5 +288,294 @@ export class FinanceService {
           ? ((totalPaid / totalRevenue) * 100).toFixed(2) + '%'
           : '0%',
     };
+  }
+
+  // Vadesi geçmiş fatura hatırlatmaları
+  async sendOverdueInvoiceReminders(
+    type: 'sms' | 'email' | 'both' = 'both',
+    minDaysOverdue: number = 1,
+  ): Promise<any> {
+    const overdueInvoices = await this.getOverdueInvoices();
+
+    // Minimum gecikme gününe göre filtrele
+    const filteredInvoices = overdueInvoices.filter(
+      (invoice) => invoice.daysPastDue >= minDaysOverdue,
+    );
+
+    const results = {
+      total: filteredInvoices.length,
+      sent: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const invoice of filteredInvoices) {
+      const customer = invoice.customer;
+      if (!customer) continue;
+
+      const message = `Sayın ${customer.fullName},\n\n${
+        invoice.invoiceNumber
+      } numaralı faturanızın vadesi ${
+        invoice.daysPastDue
+      } gün önce dolmuştur.\n\nFatura Tarihi: ${new Date(
+        invoice.invoiceDate,
+      ).toLocaleDateString('tr-TR')}\nVade Tarihi: ${new Date(
+        invoice.dueDate,
+      ).toLocaleDateString('tr-TR')}\nToplam Tutar: ₺${Number(
+        invoice.totalAmount,
+      ).toFixed(2)}\nKalan Tutar: ₺${Number(invoice.remainingAmount).toFixed(
+        2,
+      )}\n\nÖdemenizi en kısa sürede yapmanızı rica ederiz.\n\nTeşekkür ederiz,\nAkın Kombi`;
+
+      try {
+        if (type === 'sms' || type === 'both') {
+          await this.communicationsService.sendSMS(customer.phone, message);
+        }
+
+        if (type === 'email' || type === 'both') {
+          await this.communicationsService.sendEmail(
+            customer.email,
+            'Fatura Ödeme Hatırlatması',
+            message,
+          );
+        }
+
+        results.sent++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          invoiceId: invoice.id,
+          customerId: customer.id,
+          error: error.message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  // Belirli bir fatura için hatırlatma gönder
+  async sendInvoiceReminder(
+    invoiceId: string,
+    type: 'sms' | 'email' | 'both' = 'both',
+  ): Promise<any> {
+    const invoice = await this.findOneInvoice(invoiceId);
+    const customer = invoice.customer;
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found for this invoice');
+    }
+
+    if (invoice.status === PaymentStatus.PAID) {
+      return {
+        success: false,
+        message: 'Invoice is already paid',
+      };
+    }
+
+    const isOverdue = invoice.isOverdue;
+    const subject = isOverdue
+      ? 'Fatura Ödeme Hatırlatması - VADESİ GEÇMİŞ'
+      : 'Fatura Ödeme Hatırlatması';
+
+    const message = `Sayın ${customer.fullName},\n\n${
+      invoice.invoiceNumber
+    } numaralı faturanız ${
+      isOverdue
+        ? `${invoice.daysPastDue} gün önce vadesi dolmuştur`
+        : `yakında sona erecektir`
+    }.\n\nFatura Tarihi: ${new Date(invoice.invoiceDate).toLocaleDateString(
+      'tr-TR',
+    )}\nVade Tarihi: ${new Date(invoice.dueDate).toLocaleDateString(
+      'tr-TR',
+    )}\nToplam Tutar: ₺${Number(invoice.totalAmount).toFixed(
+      2,
+    )}\nÖdenen Tutar: ₺${Number(invoice.paidAmount).toFixed(
+      2,
+    )}\nKalan Tutar: ₺${Number(invoice.remainingAmount).toFixed(
+      2,
+    )}\n\nÖdemenizi yapmanızı rica ederiz.\n\nTeşekkür ederiz,\nAkın Kombi`;
+
+    const results = { sms: false, email: false };
+
+    try {
+      if (type === 'sms' || type === 'both') {
+        await this.communicationsService.sendSMS(customer.phone, message);
+        results.sms = true;
+      }
+
+      if (type === 'email' || type === 'both') {
+        await this.communicationsService.sendEmail(
+          customer.email,
+          subject,
+          message,
+        );
+        results.email = true;
+      }
+
+      return {
+        success: true,
+        message: 'Reminder sent successfully',
+        results,
+      };
+    } catch (error) {
+      throw new Error(`Failed to send reminder: ${error.message}`);
+    }
+  }
+
+  // Taksitli ödeme planı oluşturma
+  async createInstallmentPlan(
+    createInstallmentPlanDto: CreateInstallmentPlanDto,
+  ): Promise<Installment[]> {
+    const invoice = await this.findOneInvoice(
+      createInstallmentPlanDto.invoiceId,
+    );
+
+    if (invoice.status === PaymentStatus.PAID) {
+      throw new Error('Cannot create installment plan for paid invoice');
+    }
+
+    // Mevcut taksitler varsa iptal et
+    await this.installmentsRepository.delete({
+      invoiceId: invoice.id,
+      status: PaymentStatus.PENDING,
+    });
+
+    const installmentAmount = Number(
+      (invoice.remainingAmount / createInstallmentPlanDto.numberOfInstallments).toFixed(2),
+    );
+
+    const installments: Installment[] = [];
+    const firstDueDate = new Date(createInstallmentPlanDto.firstDueDate);
+
+    for (let i = 0; i < createInstallmentPlanDto.numberOfInstallments; i++) {
+      const dueDate = new Date(firstDueDate);
+      dueDate.setDate(
+        dueDate.getDate() + i * createInstallmentPlanDto.intervalDays,
+      );
+
+      const installmentNumber = `T-${invoice.invoiceNumber}-${i + 1}`;
+
+      // Son taksitte kalan tutarı ekleme (yuvarlama farkı)
+      const isLastInstallment =
+        i === createInstallmentPlanDto.numberOfInstallments - 1;
+      const amount = isLastInstallment
+        ? Number(
+            (
+              invoice.remainingAmount -
+              installmentAmount * i
+            ).toFixed(2),
+          )
+        : installmentAmount;
+
+      const installment = this.installmentsRepository.create({
+        installmentNumber,
+        installmentOrder: i + 1,
+        totalInstallments: createInstallmentPlanDto.numberOfInstallments,
+        amount,
+        dueDate,
+        status: PaymentStatus.PENDING,
+        invoiceId: invoice.id,
+        customerId: invoice.customerId,
+        notes: createInstallmentPlanDto.notes,
+      });
+
+      installments.push(installment);
+    }
+
+    return await this.installmentsRepository.save(installments);
+  }
+
+  // Faturaya göre taksitleri getir
+  async getInstallmentsByInvoice(invoiceId: string): Promise<Installment[]> {
+    return await this.installmentsRepository.find({
+      where: { invoiceId },
+      relations: ['invoice', 'customer'],
+      order: { installmentOrder: 'ASC' },
+    });
+  }
+
+  // Müşteriye göre taksitleri getir
+  async getInstallmentsByCustomer(customerId: string): Promise<Installment[]> {
+    return await this.installmentsRepository.find({
+      where: { customerId },
+      relations: ['invoice', 'customer'],
+      order: { dueDate: 'ASC' },
+    });
+  }
+
+  // Taksit ödeme
+  async payInstallment(
+    installmentId: string,
+    paymentTransactionId?: string,
+  ): Promise<Installment> {
+    const installment = await this.installmentsRepository.findOne({
+      where: { id: installmentId },
+      relations: ['invoice'],
+    });
+
+    if (!installment) {
+      throw new NotFoundException('Installment not found');
+    }
+
+    if (installment.status === PaymentStatus.PAID) {
+      throw new Error('Installment is already paid');
+    }
+
+    installment.status = PaymentStatus.PAID;
+    installment.paidDate = new Date();
+    installment.paymentTransactionId = paymentTransactionId;
+
+    const savedInstallment = await this.installmentsRepository.save(
+      installment,
+    );
+
+    // Fatura ödeme bilgilerini güncelle
+    if (installment.invoice) {
+      const invoice = installment.invoice;
+      invoice.paidAmount = Number(invoice.paidAmount) + Number(installment.amount);
+      invoice.remainingAmount = Number(invoice.totalAmount) - Number(invoice.paidAmount);
+
+      if (invoice.remainingAmount <= 0) {
+        invoice.status = PaymentStatus.PAID;
+      } else if (invoice.paidAmount > 0) {
+        invoice.status = PaymentStatus.PARTIAL;
+      }
+
+      await this.invoicesRepository.save(invoice);
+    }
+
+    return savedInstallment;
+  }
+
+  // Yaklaşan taksitler
+  async getUpcomingInstallments(daysAhead: number = 7): Promise<Installment[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const futureDate = new Date(today);
+    futureDate.setDate(futureDate.getDate() + daysAhead);
+
+    return await this.installmentsRepository.find({
+      where: {
+        status: PaymentStatus.PENDING,
+        dueDate: Between(today, futureDate),
+      },
+      relations: ['invoice', 'customer'],
+      order: { dueDate: 'ASC' },
+    });
+  }
+
+  // Vadesi geçmiş taksitler
+  async getOverdueInstallments(): Promise<Installment[]> {
+    const today = new Date();
+    return await this.installmentsRepository.find({
+      where: {
+        status: PaymentStatus.PENDING,
+        dueDate: LessThan(today),
+      },
+      relations: ['invoice', 'customer'],
+      order: { dueDate: 'ASC' },
+    });
   }
 }

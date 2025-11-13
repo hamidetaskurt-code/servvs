@@ -72,4 +72,25 @@ export class CustomersController {
   remove(@Param('id') id: string) {
     return this.customersService.remove(id);
   }
+
+  @Get('warranties/expiring')
+  getExpiringWarranties(@Query('daysAhead') daysAhead?: string) {
+    return this.customersService.getExpiringWarranties(
+      daysAhead ? parseInt(daysAhead) : 30,
+    );
+  }
+
+  @Post('warranties/reminders')
+  sendWarrantyReminders(
+    @Body()
+    body: {
+      daysAhead?: number;
+      type?: 'sms' | 'email' | 'both';
+    },
+  ) {
+    return this.customersService.sendWarrantyExpirationReminders(
+      body.daysAhead || 30,
+      body.type || 'both',
+    );
+  }
 }
