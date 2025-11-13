@@ -1,0 +1,63 @@
+<!-- /desktop/src/pages/inventory.html -->
+<div id="inventoryPage" class="page">
+    <div class="page-header">
+        <h2>Stok Yönetimi</h2>
+        <button id="add-part-btn" class="btn-primary">+ Yeni Parça Ekle</button>
+    </div>
+
+    <!-- Inventory Dashboard -->
+    <div class="stats-grid" id="inventoryDashboard">
+        <div class="dashboard-card danger">
+            <div class="stat-icon">🔥</div>
+            <h3>Kritik Seviye</h3>
+            <p class="stat-value" id="criticalStockCount">0 Parça</p>
+        </div>
+        <div class="dashboard-card warning">
+            <div class="stat-icon">📉</div>
+            <h3>Düşük Stok</h3>
+            <p class="stat-value" id="lowStockCount">0 Parça</p>
+        </div>
+        <div class="dashboard-card info">
+            <div class="stat-icon">📦</div>
+            <h3>Toplam Envanter</h3>
+            <p class="stat-value" id="totalInventoryCount">0 Parça</p>
+        </div>
+        <div class="dashboard-card success">
+            <div class="stat-icon">💰</div>
+            <h3>Envanter Değeri</h3>
+            <p class="stat-value" id="totalInventoryValue">₺0</p>
+        </div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="page-header">
+        <h3>Parça Listesi</h3>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="partSearch" placeholder="🔍 Parça ara (Ad, Kod, Kategori)..." oninput="filterParts()">
+        <select id="stockStatusFilter" onchange="filterParts()">
+            <option value="">Tüm Stok Durumları</option>
+            <option value="critical">Kritik</option>
+            <option value="low">Düşük</option>
+            <option value="ok">Yeterli</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table id="partsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Parça Adı</th>
+                    <th>Kategori</th>
+                    <th>Stok</th>
+                    <th>Birim Fiyat</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Parça listesi dinamik olarak yüklenecek -->
+            </tbody>
+        </table>
+    </div>
+</div>
