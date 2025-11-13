@@ -13,7 +13,10 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api/v1');
 
-  await app.listen(3001);
-  console.log('🚀 Backend running on http://localhost:3001/api/v1');
+  const port = process.env.PORT || 3002;
+  await app.listen(port);
+  console.log(`🚀 Backend running on http://localhost:${port}/api/v1`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`💾 Database: ${process.env.DB_NAME || 'akinkombi_new'}`);
 }
 bootstrap();

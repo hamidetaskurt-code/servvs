@@ -166,8 +166,8 @@ export class RouteOptimizationService {
 
     try {
       const origins: Coordinate[] = services.map((s) => ({
-        lat: parseFloat(s.customer.latitude) || 41.015137,
-        lng: parseFloat(s.customer.longitude) || 28.97953,
+        lat: parseFloat(String(s.customer.latitude)) || 41.015137,
+        lng: parseFloat(String(s.customer.longitude)) || 28.97953,
       }));
 
       const destinations = [...origins];
@@ -341,14 +341,16 @@ export class RouteOptimizationService {
   private async saveOptimizationLog(logData: any): Promise<void> {
     try {
       const log = this.optimizationLogsRepository.create({
-        optimizationDate: logData.date,
-        technicianId: null,
-        totalServices: logData.totalServices,
-        alternativesGenerated: logData.alternativesGenerated,
-        selectedRouteScore: 85,
-        optimizationGoal: logData.optimizationGoal,
-        distanceReduction: 0,
-        durationReduction: 0,
+        optimizationDate: logData.date || new Date(),
+        technicianId: logData.technicianId || null,
+        totalServices: logData.totalServices || 0,
+        alternativesGenerated: logData.alternativesGenerated || 3,
+        selectedAlternative: 'A',
+        optimizationScore: 85,
+        totalDistanceKm: 0,
+        totalDurationMinutes: 0,
+        analysisResult: {},
+        createdAt: new Date(),
       });
 
       await this.optimizationLogsRepository.save(log);
