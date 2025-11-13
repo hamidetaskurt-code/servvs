@@ -1,0 +1,43 @@
+<div id="servicesPage" class="page">
+    <div class="page-header">
+        <h2>Servis Panosu</h2>
+        <button id="add-service-btn" class="btn-primary">+ Yeni Servis</button>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="serviceSearch" placeholder="🔍 Servis ara (Müşteri, Teknisyen, Adres)..." oninput="filterServices()">
+        <select id="technicianFilter" onchange="filterServices()">
+            <option value="">Tüm Teknisyenler</option>
+            <!-- Teknisyenler dinamik olarak yüklenecek -->
+        </select>
+        <select id="priorityFilter" onchange="filterServices()">
+            <option value="">Tüm Öncelikler</option>
+            <option value="low">Düşük</option>
+            <option value="normal">Normal</option>
+            <option value="high">Yüksek</option>
+            <option value="urgent">Acil</option>
+        </select>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard">
+        <div class="kanban-column" id="pending" data-status="pending">
+            <h3>Bekleyen <span class="count">(0)</span></h3>
+            <div class="kanban-cards" data-status="pending"></div>
+        </div>
+        <div class="kanban-column" id="planned" data-status="planned">
+            <h3>Planlandı <span class="count">(0)</span></h3>
+            <div class="kanban-cards" data-status="planned"></div>
+        </div>
+        <div class="kanban-column" id="in_progress" data-status="in_progress">
+            <h3>Devam Ediyor <span class="count">(0)</span></h3>
+            <div class="kanban-cards" data-status="in_progress"></div>
+        </div>
+        <div class="kanban-column" id="completed" data-status="completed">
+            <h3>Tamamlandı <span class="count">(0)</span></h3>
+            <div class="kanban-cards" data-status="completed"></div>
+        </div>
+        <div class="kanban-column" id="cancelled" data-status="cancelled">
+            <h3>İptal <span class="count">(0)</span></h3>
+            <div class="kanban-cards" data-status="cancelled"></div>
+        </div>
+    </div>
+</div>

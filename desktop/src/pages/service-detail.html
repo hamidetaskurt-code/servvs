@@ -1,0 +1,50 @@
+<!-- /desktop/src/pages/service-detail.html -->
+<div id="serviceDetailPage" class="page">
+    <div class="page-header">
+        <h2 id="serviceDetailTitle">Servis Detayı #S-XXXX</h2>
+        <button id="backToKanbanBtn" class="btn btn-secondary">‹ Geri Dön</button>
+    </div>
+
+    <!-- Status Card -->
+    <div class="status-card" id="serviceStatusCard">
+        <!-- Durum bilgileri dinamik olarak yüklenecek -->
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-link active" data-tab="tab-info">Genel Bilgiler</button>
+        <button class="tab-link" data-tab="tab-actions">Yapılan İşlemler</button>
+        <button class="tab-link" data-tab="tab-parts">Kullanılan Parçalar</button>
+        <button class="tab-link" data-tab="tab-cost">Maliyet Detayı</button>
+        <button class="tab-link" data-tab="tab-photos">Fotoğraflar</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-info" class="tab-content active">
+        <h4>Müşteri ve Cihaz Bilgileri</h4>
+        <div id="serviceCustomerInfo"></div>
+        <hr>
+        <h4>Servis Detayları</h4>
+        <div id="servicePrimaryInfo"></div>
+    </div>
+
+    <div id="tab-actions" class="tab-content">
+        <h4>Yapılan İşlemler</h4>
+        <div id="serviceActionsList"></div>
+    </div>
+
+    <div id="tab-parts" class="tab-content">
+        <h4>Kullanılan Parçalar</h4>
+        <div id="servicePartsList"></div>
+    </div>
+
+    <div id="tab-cost" class="tab-content">
+        <h4>Maliyet Detayı</h4>
+        <div id="serviceCostDetails"></div>
+    </div>
+
+    <div id="tab-photos" class="tab-content">
+        <h4>Fotoğraflar</h4>
+        <div id="servicePhotoGallery"></div>
+    </div>
+</div>
