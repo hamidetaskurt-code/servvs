@@ -216,3 +216,16 @@ app.get('/api/v1/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Mock Server running on port ${PORT}`);
 });
+
+// Update service status
+app.put("/api/v1/services/:id/status", auth, (req, res) => {
+  const id = parseInt(req.params.id);
+  const { status } = req.body;
+  const index = services.findIndex(s => s.service_id === id);
+  if (index !== -1) {
+    services[index].status = status;
+    res.json(services[index]);
+  } else {
+    res.status(404).json({ message: "Not found" });
+  }
+});
