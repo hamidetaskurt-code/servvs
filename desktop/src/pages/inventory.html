@@ -1,0 +1,38 @@
+<div id="inventoryPage" class="page">
+    <div class="page-header">
+        <h2>Stok Yönetimi</h2>
+        <button class="btn-primary" onclick="showAddPart()">+ Yeni Parça</button>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="partSearch" placeholder="🔍 Parça ara..." oninput="searchParts()">
+        <label class="checkbox-label">
+            <input type="checkbox" id="lowStockFilter" onchange="filterLowStock()">
+            Sadece Düşük Stok
+        </label>
+        <button class="btn btn-secondary" onclick="exportToExcel('inventory')">Excel İndir</button>
+        <div class="pagination-controls">
+            <button onclick="previousPage('inventory')" id="inventoryPrevBtn">«</button>
+            <span id="inventoryPageInfo">1/1</span>
+            <button onclick="nextPage('inventory')" id="inventoryNextBtn">»</button>
+            <select id="inventoryPageSize" onchange="changePageSize('inventory')">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-container">
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('inventory', 0)">ID ↕</th>
+                    <th onclick="sortTable('inventory', 1)">Parça Adı ↕</th>
+                    <th onclick="sortTable('inventory', 2)">Stok ↕</th>
+                    <th onclick="sortTable('inventory', 3)">Fiyat ↕</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>

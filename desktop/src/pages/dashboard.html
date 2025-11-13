@@ -1,0 +1,44 @@
+<div id="dashboardPage" class="page active">
+    <h2 class="section-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Dashboard
+    </h2>
+    <div class="stats-grid">
+        <div class="dashboard-card primary">
+            <div class="stat-icon">👥</div>
+            <h3>Toplam Müşteri</h3>
+            <p class="stat-value" id="totalCustomers">0</p>
+        </div>
+        <div class="dashboard-card warning">
+            <div class="stat-icon">⏳</div>
+            <h3>Bekleyen Servisler</h3>
+            <p class="stat-value" id="pendingServices">0</p>
+        </div>
+        <div class="dashboard-card info">
+            <div class="stat-icon">📅</div>
+            <h3>Bugünkü Randevular</h3>
+            <p class="stat-value" id="todayAppointments">0</p>
+        </div>
+        <div class="dashboard-card success">
+            <div class="stat-icon">💰</div>
+            <h3>Aylık Gelir</h3>
+            <p class="stat-value" id="monthlyRevenue">0 ₺</p>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-section">
+            <h3>Son Servisler</h3>
+            <div id="recentServices" class="recent-list"></div>
+        </div>
+        <div class="dashboard-section">
+            <h3>Düşük Stok Uyarıları</h3>
+            <div id="lowStockAlerts" class="recent-list"></div>
+        </div>
+    </div>
+</div>
