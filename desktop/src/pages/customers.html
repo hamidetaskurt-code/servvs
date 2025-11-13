@@ -1,0 +1,34 @@
+<div id="customersPage" class="page">
+    <div class="page-header">
+        <h2>Müşteriler</h2>
+        <button class="btn-primary" onclick="showAddCustomer()">+ Yeni Müşteri</button>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="customerSearch" placeholder="🔍 Müşteri ara..." oninput="searchCustomers()">
+        <button class="btn btn-secondary" onclick="exportToExcel('customers')">Excel İndir</button>
+        <div class="pagination-controls">
+            <button onclick="previousPage('customers')" id="customerPrevBtn">«</button>
+            <span id="customerPageInfo">1/1</span>
+            <button onclick="nextPage('customers')" id="customerNextBtn">»</button>
+            <select id="customerPageSize" onchange="changePageSize('customers')">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-container">
+        <table id="customersTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('customers', 0)">ID ↕</th>
+                    <th onclick="sortTable('customers', 1)">Ad Soyad ↕</th>
+                    <th onclick="sortTable('customers', 2)">Telefon ↕</th>
+                    <th onclick="sortTable('customers', 3)">Adres ↕</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
