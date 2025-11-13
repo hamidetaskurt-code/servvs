@@ -129,6 +129,23 @@ Randevu yeniden planla
 Çakışma kontrolü
 - Query: technicianId, date, duration
 
+### POST /appointments/reminder/:id
+**[YENİ - FAZ 2]** Tek randevu hatırlatması gönder
+- Body: type ('sms' | 'email' | 'both')
+- Returns: success, message, results (sms: boolean, email: boolean)
+- Otomatik mesaj içeriği: müşteri adı, tarih, saat, servis tipi, teknisyen
+
+### POST /appointments/reminders/bulk
+**[YENİ - FAZ 2]** Toplu randevu hatırlatması gönder
+- Body: type ('sms' | 'email' | 'both'), hoursAhead (default: 24)
+- Belirtilen saat öncesindeki randevular için hatırlatma gönderir
+- Returns: total, sent, failed, errors[]
+
+### GET /appointments/upcoming
+**[YENİ - FAZ 2]** Yaklaşan randevuları listele
+- Query: hoursAhead (default: 24)
+- Returns: Belirtilen saat içindeki PLANNED durumundaki randevular
+
 ---
 
 ## 5. Technicians Module
@@ -209,6 +226,17 @@ Parça sil
 
 ### POST /parts/update-averages
 Aylık ortalamaları güncelle
+
+### GET /parts/reorder/suggestions
+**[YENİ - FAZ 2]** Akıllı sipariş önerileri
+- Returns: Kullanım paternlerine dayalı otomatik sipariş önerileri
+- Her öneri: partId, partCode, partName, category, supplier, currentStock, minStockLevel, avgMonthlyUsage, daysUntilEmpty, suggestedOrderQty, estimatedCost, urgency (critical/high/medium/low)
+- Aciliyete göre sıralı
+
+### GET /parts/alerts
+**[YENİ - FAZ 2]** Stok uyarı sistemi özeti
+- Returns: summary (criticalCount, lowStockCount, reorderSuggestionsCount, totalAlerts), criticalParts[], lowStockParts[], reorderSuggestions[] (ilk 10)
+- Dashboard'da gösterilmek için kapsamlı stok durumu
 
 ---
 
@@ -327,13 +355,40 @@ Yeni şablon oluştur
 - Query: customerId, type, limit (optional)
 
 ### POST /communications/campaigns
-Kampanya oluştur
+**[GENİŞLETİLDİ - FAZ 2]** Kampanya oluştur
+- Body: name, type (SMS/EMAIL/WHATSAPP), content, subject (email için), targetSegment (opsiyonel müşteri segmenti)
+- targetSegment: { type, city, minSpent } - hedef müşteri filtreleme
 
 ### GET /communications/campaigns
-Kampanya listesi
+**[GENİŞLETİLDİ - FAZ 2]** Kampanya listesi
+- Query: status (DRAFT/SCHEDULED/SENT/CANCELLED) - opsiyonel filtreleme
+- Returns: Kampanyalar createdAt'e göre DESC sıralı
+
+### GET /communications/campaigns/:id
+**[YENİ - FAZ 2]** Tek kampanya detayı
+- Returns: Belirtilen ID'deki kampanya bilgileri
+
+### PUT /communications/campaigns/:id
+**[YENİ - FAZ 2]** Kampanya güncelle
+- Body: Güncellenecek alanlar (name, content, targetSegment, vb.)
+- Returns: Güncellenmiş kampanya
+
+### DELETE /communications/campaigns/:id
+**[YENİ - FAZ 2]** Kampanya sil
+- Soft delete
+- Returns: { success: true, message: 'Campaign deleted' }
 
 ### GET /communications/campaigns/:id/stats
-Kampanya istatistikleri
+**[GENİŞLETİLDİ - FAZ 2]** Kampanya istatistikleri
+- Returns: campaign (id, name, type, status), stats (recipients, sent, delivered, failed, deliveryRate%)
+
+### POST /communications/campaigns/:id/send
+**[YENİ - FAZ 2]** Kampanya gönder
+- Hedef müşterileri targetSegment'e göre seçer ve kampanyayı gönderir
+- Segment filtreleme: type, city, minSpent
+- Otomatik istatistik güncelleme (sentCount, deliveredCount, failedCount)
+- status: SENT'e güncellenir, sentAt timestamp eklenir
+- Returns: { success, message, stats: { sent, delivered, failed } }
 
 ---
 
@@ -360,18 +415,23 @@ Firma bilgilerini güncelle
 
 ---
 
-## Toplam: 77+ Endpoint
+## Toplam: 90 Endpoint
 
 **Modül Dağılımı:**
 - Dashboard: 2
 - Customers: 10
 - Services: 13
-- Appointments: 7
+- Appointments: 10 (+3 FAZ 2)
 - Technicians: 7
-- Parts: 14
+- Parts: 16 (+2 FAZ 2)
 - Finance: 9
 - Reports: 9
-- Communications: 12
+- Communications: 17 (+5 FAZ 2)
 - Settings: 6
 
 **Durum:** ✅ Tüm modüller tamamlandı ve çalışır durumda
+
+**Son Güncellemeler (FAZ 2):**
+- ✅ Stok Yönetimi: Akıllı sipariş önerileri ve stok uyarı sistemi
+- ✅ Kampanya Sistemi: Full CRUD + gönderim + segment filtreleme
+- ✅ Randevu Hatırlatmaları: SMS/Email/Both hatırlatma sistemi

@@ -1,4 +1,4 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('campaigns')
@@ -7,6 +7,7 @@ export class Campaign extends BaseEntity {
   name: string;
 
   @Column({ type: 'varchar', length: 20 })
+  @Index()
   type: string; // SMS, EMAIL, WHATSAPP
 
   @Column({ type: 'text' })
@@ -19,12 +20,14 @@ export class Campaign extends BaseEntity {
   targetSegment?: any; // Hedef müşteri segmenti
 
   @Column({ type: 'timestamp', nullable: true })
+  @Index()
   scheduledAt?: Date;
 
   @Column({ type: 'timestamp', nullable: true })
   sentAt?: Date;
 
   @Column({ type: 'varchar', length: 20, default: 'DRAFT' })
+  @Index()
   status: string; // DRAFT, SCHEDULED, SENT, CANCELLED
 
   @Column({ type: 'int', default: 0 })
