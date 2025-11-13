@@ -1,0 +1,193 @@
+<!-- Servis Oluştur Modal -->
+<div id="service-modal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 900px;">
+    <div class="modal-header">
+      <h2 id="service-modal-title">Yeni Servis Oluştur</h2>
+      <span class="close" onclick="closeModal('service-modal')">&times;</span>
+    </div>
+
+    <form id="service-form" onsubmit="handleServiceSubmit(event)">
+      <input type="hidden" id="service-id" name="id">
+
+      <!-- Müşteri ve Cihaz Seçimi -->
+      <div class="form-section">
+        <h3>Müşteri ve Cihaz</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="service-customer">Müşteri *</label>
+            <select id="service-customer" name="customerId" required onchange="loadCustomerDevices(this.value)">
+              <option value="">Müşteri seçiniz...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="service-device">Cihaz *</label>
+            <select id="service-device" name="deviceId" required disabled>
+              <option value="">Önce müşteri seçiniz...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servis Detayları -->
+      <div class="form-section">
+        <h3>Servis Detayları</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="service-type">Servis Tipi *</label>
+            <select id="service-type" name="serviceType" required>
+              <option value="">Seçiniz...</option>
+              <option value="maintenance">Bakım</option>
+              <option value="repair">Tamir</option>
+              <option value="installation">Kurulum</option>
+              <option value="inspection">Kontrol</option>
+              <option value="warranty">Garanti</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="service-priority">Öncelik *</label>
+            <select id="service-priority" name="priority" required>
+              <option value="normal">Normal</option>
+              <option value="high">Yüksek</option>
+              <option value="urgent">Acil</option>
+              <option value="low">Düşük</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="service-status">Durum</label>
+            <select id="service-status" name="status">
+              <option value="pending">Beklemede</option>
+              <option value="scheduled">Planlandı</option>
+              <option value="in_progress">Devam Ediyor</option>
+              <option value="completed">Tamamlandı</option>
+              <option value="cancelled">İptal Edildi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sorun Açıklaması -->
+      <div class="form-section">
+        <h3>Sorun Açıklaması</h3>
+        <div class="form-group">
+          <label for="service-problem">Müşteri Şikayeti / Sorun *</label>
+          <textarea id="service-problem" name="problemDescription" rows="3" required placeholder="Müşterinin bildirdiği sorunu detaylı açıklayın..."></textarea>
+        </div>
+      </div>
+
+      <!-- Teknisyen Atama -->
+      <div class="form-section">
+        <h3>Teknisyen Atama</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="service-technician">Teknisyen</label>
+            <select id="service-technician" name="technicianId">
+              <option value="">Sonra atanacak...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="service-scheduled-date">Planlanan Tarih</label>
+            <input type="date" id="service-scheduled-date" name="scheduledDate">
+          </div>
+
+          <div class="form-group">
+            <label for="service-estimated-duration">Tahmini Süre (dk)</label>
+            <input type="number" id="service-estimated-duration" name="estimatedDuration" placeholder="60" min="15" step="15">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fiyat Bilgisi -->
+      <div class="form-section">
+        <h3>Fiyat Bilgisi</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="service-labor-cost">İşçilik Ücreti (₺)</label>
+            <input type="number" id="service-labor-cost" name="laborCost" placeholder="0.00" step="0.01" min="0">
+          </div>
+
+          <div class="form-group">
+            <label for="service-parts-cost">Parça Maliyeti (₺)</label>
+            <input type="number" id="service-parts-cost" name="partsCost" placeholder="0.00" step="0.01" min="0" readonly>
+            <small style="color: var(--slate-400); margin-top: 4px;">Parçalar eklendikçe otomatik hesaplanacak</small>
+          </div>
+
+          <div class="form-group">
+            <label for="service-total-cost">Toplam Tutar (₺)</label>
+            <input type="number" id="service-total-cost" name="totalCost" placeholder="0.00" step="0.01" min="0" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notlar -->
+      <div class="form-section">
+        <h3>İç Notlar</h3>
+        <div class="form-group">
+          <label for="service-notes">Teknisyen Notları</label>
+          <textarea id="service-notes" name="technicianNotes" rows="2" placeholder="Teknisyen için özel notlar..."></textarea>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('service-modal')">İptal</button>
+        <button type="button" class="btn btn-outline" onclick="saveServiceAsDraft()">Taslak Olarak Kaydet</button>
+        <button type="submit" class="btn btn-primary">
+          <span class="btn-text">Servis Oluştur</span>
+          <span class="btn-loading" style="display: none;">Oluşturuluyor...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Müşteri cihazlarını yükle
+async function loadCustomerDevices(customerId) {
+  const deviceSelect = document.getElementById('service-device');
+
+  if (!customerId) {
+    deviceSelect.disabled = true;
+    deviceSelect.innerHTML = '<option value="">Önce müşteri seçiniz...</option>';
+    return;
+  }
+
+  try {
+    showLoading('Cihazlar yükleniyor...');
+
+    const response = await fetch(`${API_BASE_URL}/customers/${customerId}/devices`);
+    const devices = await response.json();
+
+    deviceSelect.disabled = false;
+    deviceSelect.innerHTML = '<option value="">Cihaz seçiniz...</option>';
+
+    devices.forEach(device => {
+      const option = document.createElement('option');
+      option.value = device.id;
+      option.textContent = `${device.brand} ${device.model} (${device.serialNumber})`;
+      deviceSelect.appendChild(option);
+    });
+
+    hideLoading();
+  } catch (error) {
+    console.error('Error loading devices:', error);
+    showNotification('Cihazlar yüklenirken hata oluştu', 'error');
+    hideLoading();
+  }
+}
+
+// Taslak olarak kaydet
+function saveServiceAsDraft() {
+  const statusField = document.getElementById('service-status');
+  statusField.value = 'pending';
+
+  document.getElementById('service-form').dispatchEvent(new Event('submit'));
+}
+</script>

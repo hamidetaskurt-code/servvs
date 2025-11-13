@@ -1,0 +1,71 @@
+<!-- Loading Container - Tüm sayfalara eklenecek -->
+<div id="loading-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center;">
+  <div style="text-align: center; color: white;">
+    <!-- Spinner -->
+    <div class="spinner" style="
+      border: 4px solid rgba(6, 182, 212, 0.2);
+      border-top: 4px solid #06b6d4;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    "></div>
+
+    <!-- Loading Text -->
+    <p style="font-size: 18px; font-weight: 500; margin: 0;">Yükleniyor...</p>
+    <p id="loading-message" style="font-size: 14px; opacity: 0.7; margin-top: 8px;"></p>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Loading container fade in/out */
+#loading-container {
+  transition: opacity 0.3s ease;
+}
+
+#loading-container.fade-in {
+  opacity: 1;
+}
+
+#loading-container.fade-out {
+  opacity: 0;
+}
+</style>
+
+<script>
+// Loading functions (ui.js'de zaten var ama burada da tanımlayalım)
+window.showLoading = function(message = '') {
+  const container = document.getElementById('loading-container');
+  const messageEl = document.getElementById('loading-message');
+
+  if (container) {
+    if (message) {
+      messageEl.textContent = message;
+    } else {
+      messageEl.textContent = '';
+    }
+
+    container.style.display = 'flex';
+    container.classList.add('fade-in');
+    container.classList.remove('fade-out');
+  }
+};
+
+window.hideLoading = function() {
+  const container = document.getElementById('loading-container');
+  if (container) {
+    container.classList.add('fade-out');
+    container.classList.remove('fade-in');
+
+    setTimeout(() => {
+      container.style.display = 'none';
+    }, 300);
+  }
+};
+</script>

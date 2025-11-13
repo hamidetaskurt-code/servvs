@@ -1,0 +1,177 @@
+<!-- Müşteri Ekle/Düzenle Modal -->
+<div id="customer-modal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 800px;">
+    <div class="modal-header">
+      <h2 id="customer-modal-title">Yeni Müşteri Ekle</h2>
+      <span class="close" onclick="closeModal('customer-modal')">&times;</span>
+    </div>
+
+    <form id="customer-form" onsubmit="handleCustomerSubmit(event)">
+      <input type="hidden" id="customer-id" name="id">
+
+      <!-- Temel Bilgiler -->
+      <div class="form-section">
+        <h3>Temel Bilgiler</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-first-name">Ad *</label>
+            <input type="text" id="customer-first-name" name="firstName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-last-name">Soyad *</label>
+            <input type="text" id="customer-last-name" name="lastName" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-email">Email *</label>
+            <input type="email" id="customer-email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-phone">Telefon *</label>
+            <input type="tel" id="customer-phone" name="phone" placeholder="05XX XXX XX XX" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-type">Müşteri Tipi</label>
+            <select id="customer-type" name="type">
+              <option value="individual">Bireysel</option>
+              <option value="corporate">Kurumsal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="customer-source">Müşteri Kaynağı</label>
+            <select id="customer-source" name="source">
+              <option value="referral">Tavsiye</option>
+              <option value="website">Website</option>
+              <option value="phone">Telefon</option>
+              <option value="social_media">Sosyal Medya</option>
+              <option value="other">Diğer</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- İletişim Bilgileri -->
+      <div class="form-section">
+        <h3>İletişim Bilgileri</h3>
+
+        <div class="form-group">
+          <label for="customer-address">Adres</label>
+          <textarea id="customer-address" name="address" rows="2" placeholder="Mahalle, Sokak, No, vb."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customer-city">Şehir</label>
+            <input type="text" id="customer-city" name="city" placeholder="İstanbul">
+          </div>
+
+          <div class="form-group">
+            <label for="customer-district">İlçe</label>
+            <input type="text" id="customer-district" name="district" placeholder="Kadıköy">
+          </div>
+
+          <div class="form-group">
+            <label for="customer-postal-code">Posta Kodu</label>
+            <input type="text" id="customer-postal-code" name="postalCode" placeholder="34XXX">
+          </div>
+        </div>
+      </div>
+
+      <!-- Notlar -->
+      <div class="form-section">
+        <h3>Notlar</h3>
+        <div class="form-group">
+          <label for="customer-notes">İç Notlar</label>
+          <textarea id="customer-notes" name="notes" rows="3" placeholder="Müşteri hakkında özel notlar..."></textarea>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('customer-modal')">İptal</button>
+        <button type="submit" class="btn btn-primary">
+          <span class="btn-text">Kaydet</span>
+          <span class="btn-loading" style="display: none;">Kaydediliyor...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.form-section {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--slate-700);
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+}
+
+.form-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cyan-400);
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--slate-300);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--slate-800);
+  border: 1px solid var(--slate-600);
+  color: var(--slate-100);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--cyan-500);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+</style>
