@@ -80,4 +80,33 @@ export class AppointmentsController {
       parseInt(duration),
     );
   }
+
+  @Post('reminder/:id')
+  sendReminder(
+    @Param('id') id: string,
+    @Body() body: { type: 'sms' | 'email' | 'both' },
+  ) {
+    return this.appointmentsService.sendReminder(id, body.type);
+  }
+
+  @Post('reminders/bulk')
+  sendBulkReminders(
+    @Body()
+    body: {
+      type: 'sms' | 'email' | 'both';
+      hoursAhead?: number;
+    },
+  ) {
+    return this.appointmentsService.sendBulkReminders(
+      body.type,
+      body.hoursAhead || 24,
+    );
+  }
+
+  @Get('upcoming')
+  getUpcomingAppointments(@Query('hoursAhead') hoursAhead?: string) {
+    return this.appointmentsService.getUpcomingAppointments(
+      hoursAhead ? parseInt(hoursAhead) : 24,
+    );
+  }
 }

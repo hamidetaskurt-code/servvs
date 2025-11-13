@@ -278,4 +278,113 @@ export class PartsService {
       await this.partsRepository.save(part);
     }
   }
+
+  // Otomatik sipariş önerileri
+  async getReorderSuggestions(): Promise<any[]> {
+    // Minimum stok seviyesinin altındaki veya reorder level'ının altındaki parçalar
+    const parts = await this.partsRepository
+      .createQueryBuilder('part')
+      .where('part.isActive = true')
+      .andWhere(
+        '(part.stockQuantity <= part.minStockLevel OR part.stockQuantity <= part.reorderLevel)',
+      )
+      .orderBy('part.stockQuantity', 'ASC')
+      .getMany();
+
+    const suggestions = await Promise.all(
+      parts.map(async (part) => {
+        // Son 30 günün kullanım verilerini al
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const movements = await this.stockMovementsRepository.find({
+          where: {
+            partId: part.id,
+            movementType: 'out',
+            movementDate: Between(thirtyDaysAgo, new Date()),
+          },
+        });
+
+        const totalUsed = movements.reduce((acc, m) => acc + m.quantity, 0);
+        const avgMonthlyUsage = totalUsed;
+
+        // Tahmini tükenme süresi (gün)
+        const daysUntilEmpty =
+          avgMonthlyUsage > 0 ? (part.stockQuantity / avgMonthlyUsage) * 30 : 999;
+
+        // Önerilen sipariş miktarı:
+        // Max stok seviyesine ulaşacak şekilde + 1 aylık ekstra
+        const suggestedOrderQty = Math.max(
+          part.maxStockLevel - part.stockQuantity + avgMonthlyUsage,
+          part.minStockLevel,
+        );
+
+        // Aciliyet seviyesi
+        let urgency: 'critical' | 'high' | 'medium' | 'low' = 'low';
+        if (part.stockQuantity <= part.minStockLevel) {
+          urgency = 'critical';
+        } else if (daysUntilEmpty <= 7) {
+          urgency = 'high';
+        } else if (daysUntilEmpty <= 14) {
+          urgency = 'medium';
+        }
+
+        return {
+          partId: part.id,
+          partCode: part.partCode,
+          partName: part.partName,
+          category: part.category,
+          supplier: part.supplier,
+          currentStock: part.stockQuantity,
+          minStockLevel: part.minStockLevel,
+          reorderLevel: part.reorderLevel,
+          maxStockLevel: part.maxStockLevel,
+          avgMonthlyUsage,
+          daysUntilEmpty: Math.round(daysUntilEmpty),
+          suggestedOrderQty: Math.ceil(suggestedOrderQty),
+          estimatedCost: Math.ceil(suggestedOrderQty) * Number(part.unitPrice),
+          urgency,
+        };
+      }),
+    );
+
+    // Aciliyete göre sırala
+    const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+    return suggestions.sort(
+      (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
+    );
+  }
+
+  // Stok uyarılarını al
+  async getStockAlerts(): Promise<any> {
+    const critical = await this.getCriticalStock();
+    const low = await this.getLowStock();
+    const suggestions = await this.getReorderSuggestions();
+
+    return {
+      summary: {
+        criticalCount: critical.length,
+        lowStockCount: low.length,
+        reorderSuggestionsCount: suggestions.length,
+        totalAlerts: critical.length + low.length,
+      },
+      criticalParts: critical.map((p) => ({
+        id: p.id,
+        partCode: p.partCode,
+        partName: p.partName,
+        currentStock: p.stockQuantity,
+        minStockLevel: p.minStockLevel,
+        category: p.category,
+      })),
+      lowStockParts: low.map((p) => ({
+        id: p.id,
+        partCode: p.partCode,
+        partName: p.partName,
+        currentStock: p.stockQuantity,
+        reorderLevel: p.reorderLevel,
+        category: p.category,
+      })),
+      reorderSuggestions: suggestions.slice(0, 10), // İlk 10 öneri
+    };
+  }
 }

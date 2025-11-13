@@ -4,6 +4,7 @@ import { Repository, Between, LessThan, MoreThan } from 'typeorm';
 import { Service } from '../services/entities/service.entity';
 import { User } from '../users/entities/user.entity';
 import { ServiceStatus } from '../../common/enums/service-status.enum';
+import { CommunicationsService } from '../communications/communications.service';
 
 @Injectable()
 export class AppointmentsService {
@@ -12,6 +13,7 @@ export class AppointmentsService {
     private servicesRepository: Repository<Service>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private communicationsService: CommunicationsService,
   ) {}
 
   async getCalendarData(year: number, month: number) {
@@ -240,5 +242,115 @@ export class AppointmentsService {
       .getCount();
 
     return conflicts > 0;
+  }
+
+  // Hatırlatma sistemi
+  async sendReminder(serviceId: string, type: 'sms' | 'email' | 'both') {
+    const service = await this.servicesRepository.findOne({
+      where: { id: serviceId },
+      relations: ['customer', 'assignedTechnician'],
+    });
+
+    if (!service || !service.customer) {
+      throw new Error('Service or customer not found');
+    }
+
+    const customer = service.customer;
+    const technician = service.assignedTechnician;
+
+    // Mesaj içeriği
+    const message = `Sayın ${customer.fullName},\n\n${
+      service.scheduledDate.toLocaleDateString('tr-TR')
+    } tarihinde saat ${service.scheduledDate.toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })} için randevunuz bulunmaktadır.\n\nServis Tipi: ${
+      service.serviceType
+    }\nTeknisyen: ${technician?.fullName || 'Atanmadı'}\n\nTeşekkür ederiz,\nAkın Kombi`;
+
+    const results = {
+      sms: false,
+      email: false,
+    };
+
+    try {
+      if (type === 'sms' || type === 'both') {
+        await this.communicationsService.sendSMS(customer.phone, message);
+        results.sms = true;
+      }
+
+      if (type === 'email' || type === 'both') {
+        await this.communicationsService.sendEmail(
+          customer.email,
+          'Randevu Hatırlatma',
+          message,
+        );
+        results.email = true;
+      }
+
+      return {
+        success: true,
+        message: 'Reminder sent successfully',
+        results,
+      };
+    } catch (error) {
+      throw new Error(`Failed to send reminder: ${error.message}`);
+    }
+  }
+
+  async sendBulkReminders(
+    reminderType: 'sms' | 'email' | 'both',
+    hoursAhead: number = 24,
+  ) {
+    const now = new Date();
+    const startTime = new Date(now.getTime() + hoursAhead * 60 * 60 * 1000);
+    const endTime = new Date(
+      startTime.getTime() + 60 * 60 * 1000,
+    ); // 1 saatlik pencere
+
+    // Gelecek randevuları al
+    const appointments = await this.servicesRepository.find({
+      where: {
+        scheduledDate: Between(startTime, endTime),
+        status: ServiceStatus.PLANNED,
+      },
+      relations: ['customer', 'assignedTechnician'],
+    });
+
+    const results = {
+      total: appointments.length,
+      sent: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const appointment of appointments) {
+      try {
+        await this.sendReminder(appointment.id, reminderType);
+        results.sent++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          serviceId: appointment.id,
+          error: error.message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  async getUpcomingAppointments(hoursAhead: number = 24) {
+    const now = new Date();
+    const endTime = new Date(now.getTime() + hoursAhead * 60 * 60 * 1000);
+
+    return await this.servicesRepository.find({
+      where: {
+        scheduledDate: Between(now, endTime),
+        status: ServiceStatus.PLANNED,
+      },
+      relations: ['customer', 'assignedTechnician'],
+      order: { scheduledDate: 'ASC' },
+    });
   }
 }

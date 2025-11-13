@@ -94,4 +94,14 @@ export class PartsController {
   updateAverages() {
     return this.partsService.updateMonthlyAverages();
   }
+
+  @Get('reorder/suggestions')
+  getReorderSuggestions() {
+    return this.partsService.getReorderSuggestions();
+  }
+
+  @Get('alerts')
+  getStockAlerts() {
+    return this.partsService.getStockAlerts();
+  }
 }

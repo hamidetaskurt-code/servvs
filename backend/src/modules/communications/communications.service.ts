@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Communication } from '../customers/entities/communication.entity';
 import { MessageTemplate } from './entities/message-template.entity';
+import { Campaign } from './entities/campaign.entity';
 import { Customer } from '../customers/entities/customer.entity';
 
 @Injectable()
@@ -12,6 +13,8 @@ export class CommunicationsService {
     private communicationsRepository: Repository<Communication>,
     @InjectRepository(MessageTemplate)
     private templatesRepository: Repository<MessageTemplate>,
+    @InjectRepository(Campaign)
+    private campaignsRepository: Repository<Campaign>,
     @InjectRepository(Customer)
     private customersRepository: Repository<Customer>,
   ) {}
@@ -181,28 +184,151 @@ export class CommunicationsService {
   }
 
   async createCampaign(campaignData: any) {
-    // Campaign functionality will be implemented later
-    return {
-      success: true,
-      message: 'Campaign created',
-      data: campaignData,
-    };
+    const campaign = this.campaignsRepository.create(campaignData);
+    return await this.campaignsRepository.save(campaign);
   }
 
-  async getCampaigns() {
-    // Campaign functionality will be implemented later
-    return [];
+  async getCampaigns(status?: string) {
+    const where: any = {};
+    if (status) {
+      where.status = status;
+    }
+
+    return await this.campaignsRepository.find({
+      where,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getCampaign(id: string) {
+    return await this.campaignsRepository.findOne({ where: { id } });
+  }
+
+  async updateCampaign(id: string, updateData: any) {
+    await this.campaignsRepository.update(id, updateData);
+    return await this.getCampaign(id);
+  }
+
+  async deleteCampaign(id: string) {
+    await this.campaignsRepository.softDelete(id);
+    return { success: true, message: 'Campaign deleted' };
   }
 
   async getCampaignStats(id: string) {
-    // Campaign functionality will be implemented later
+    const campaign = await this.getCampaign(id);
+
+    if (!campaign) {
+      return null;
+    }
+
+    const deliveryRate =
+      campaign.sentCount > 0
+        ? (campaign.deliveredCount / campaign.sentCount) * 100
+        : 0;
+
     return {
-      campaign: { id },
+      campaign: {
+        id: campaign.id,
+        name: campaign.name,
+        type: campaign.type,
+        status: campaign.status,
+      },
       stats: {
-        sent: 0,
-        delivered: 0,
-        failed: 0,
-        deliveryRate: 0,
+        recipients: campaign.recipientCount,
+        sent: campaign.sentCount,
+        delivered: campaign.deliveredCount,
+        failed: campaign.failedCount,
+        deliveryRate: parseFloat(deliveryRate.toFixed(2)),
+      },
+    };
+  }
+
+  async sendCampaign(id: string) {
+    const campaign = await this.getCampaign(id);
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (campaign.status === 'SENT') {
+      throw new Error('Campaign already sent');
+    }
+
+    // Hedef müşterileri al
+    let customers: Customer[];
+
+    if (campaign.targetSegment) {
+      // Segment bazlı filtreleme (örnek: VIP müşteriler, belirli bir şehirdeki müşteriler, vb.)
+      const query = this.customersRepository.createQueryBuilder('customer');
+
+      if (campaign.targetSegment.type) {
+        query.andWhere('customer.type = :type', {
+          type: campaign.targetSegment.type,
+        });
+      }
+
+      if (campaign.targetSegment.city) {
+        query.andWhere('customer.city = :city', {
+          city: campaign.targetSegment.city,
+        });
+      }
+
+      if (campaign.targetSegment.minSpent) {
+        query.andWhere('customer.totalSpent >= :minSpent', {
+          minSpent: campaign.targetSegment.minSpent,
+        });
+      }
+
+      customers = await query.getMany();
+    } else {
+      // Tüm aktif müşteriler
+      customers = await this.customersRepository.find();
+    }
+
+    campaign.recipientCount = customers.length;
+
+    // Kampanyayı gönder
+    let sentCount = 0;
+    let deliveredCount = 0;
+    let failedCount = 0;
+
+    for (const customer of customers) {
+      try {
+        if (campaign.type === 'SMS') {
+          await this.sendSMS(customer.phone, campaign.content);
+        } else if (campaign.type === 'EMAIL') {
+          await this.sendEmail(
+            customer.email,
+            campaign.subject || 'Bilgilendirme',
+            campaign.content,
+          );
+        } else if (campaign.type === 'WHATSAPP') {
+          await this.sendWhatsApp(customer.phone, campaign.content);
+        }
+
+        sentCount++;
+        deliveredCount++; // Gerçek entegrasyonda delivery notification ile güncellenecek
+      } catch (error) {
+        failedCount++;
+      }
+    }
+
+    // Campaign istatistiklerini güncelle
+    campaign.sentCount = sentCount;
+    campaign.deliveredCount = deliveredCount;
+    campaign.failedCount = failedCount;
+    campaign.status = 'SENT';
+    campaign.sentAt = new Date();
+
+    await this.campaignsRepository.save(campaign);
+
+    return {
+      success: true,
+      message: 'Campaign sent successfully',
+      stats: {
+        sent: sentCount,
+        delivered: deliveredCount,
+        failed: failedCount,
       },
     };
   }
