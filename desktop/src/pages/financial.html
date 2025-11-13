@@ -1,0 +1,66 @@
+<!-- /desktop/src/pages/financial.html -->
+<div id="financialPage" class="page">
+    <div class="page-header">
+        <h2>Finans Yönetimi</h2>
+        <button id="add-expense-btn" class="btn btn-secondary">Gider Ekle</button>
+    </div>
+
+    <!-- Financial Dashboard -->
+    <div class="stats-grid" id="financialDashboard">
+        <div class="dashboard-card success">
+            <div class="stat-icon">💰</div>
+            <h3>Bu Ayki Gelir</h3>
+            <p class="stat-value" id="monthlyIncome">₺0</p>
+        </div>
+        <div class="dashboard-card danger">
+            <div class="stat-icon">💸</div>
+            <h3>Bu Ayki Gider</h3>
+            <p class="stat-value" id="monthlyExpense">₺0</p>
+        </div>
+        <div class="dashboard-card primary">
+            <div class="stat-icon">💵</div>
+            <h3>Net Kar</h3>
+            <p class="stat-value" id="netProfit">₺0</p>
+        </div>
+        <div class="dashboard-card warning">
+            <div class="stat-icon">⏳</div>
+            <h3>Vadesi Geçmiş Bakiye</h3>
+            <p class="stat-value" id="overdueBalance">₺0</p>
+        </div>
+    </div>
+
+    <!-- Invoice List -->
+    <div class="page-header">
+        <h3>Fatura Yönetimi</h3>
+    </div>
+    <div class="search-filter-bar">
+        <input type="text" id="invoiceSearch" placeholder="🔍 Fatura ara (Müşteri, Fatura No)...">
+        <select id="invoiceStatusFilter">
+            <option value="">Tüm Durumlar</option>
+            <option value="draft">Taslak</option>
+            <option value="sent">Gönderildi</option>
+            <option value="paid">Ödendi</option>
+            <option value="overdue">Gecikmiş</option>
+            <option value="cancelled">İptal</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table id="invoicesTable">
+            <thead>
+                <tr>
+                    <th>Fatura No</th>
+                    <th>Müşteri</th>
+                    <th>Tarih</th>
+                    <th>Vade Tarihi</th>
+                    <th>Tutar</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Fatura listesi dinamik olarak yüklenecek -->
+            </tbody>
+        </table>
+    </div>
+</div>

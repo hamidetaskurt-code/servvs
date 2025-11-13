@@ -1,0 +1,41 @@
+<!-- /desktop/src/components/part-detail-modal.html -->
+<div id="partDetailModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <span class="modal-close">&times;</span>
+            <h2 id="partDetailName">Parça Detayı</h2>
+        </div>
+        <div class="modal-body">
+            <!-- Part Card -->
+            <div class="part-card-detail">
+                <div class="part-card-main">
+                    <p><strong>Kod:</strong> <span id="partDetailCode"></span></p>
+                    <p><strong>Kategori:</strong> <span id="partDetailCategory"></span></p>
+                    <p><strong>Birim Fiyat:</strong> <span id="partDetailPrice"></span></p>
+                    <p><strong>Raf Konumu:</strong> <span id="partDetailLocation"></span></p>
+                    <p><strong>Tedarikçi:</strong> <span id="partDetailSupplier"></span></p>
+                </div>
+                <div class="part-card-stock">
+                    <div class="stock-level" id="partDetailStockLevel">
+                        <span class="stock-value" id="partDetailStock">0</span>
+                        <span class="stock-label">Adet Stokta</span>
+                    </div>
+                    <div class="stock-stats">
+                        <p><strong>Son 30 gün kullanım:</strong> <span id="partDetailUsage"></span></p>
+                        <p><strong>Tahmini Tükenme:</strong> <span id="partDetailDepletion"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Movements -->
+            <h4 style="margin-top: 30px;">Stok Hareketleri</h4>
+            <div class="timeline" id="partMovementsTimeline">
+                <!-- Hareketler dinamik olarak yüklenecek -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('partDetailModal')">Kapat</button>
+            <button type="button" class="btn btn-primary" id="editPartFromDetailBtn">Düzenle</button>
+        </div>
+    </div>
+</div>
