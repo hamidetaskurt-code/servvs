@@ -34,10 +34,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadComponents() {
     try {
-        const response = await fetch("../components/service-wizard.html");
-        if(response.ok) {
-            document.getElementById("modal-container").innerHTML += await response.text();
-            initializeWizard();
+        // Load all modal components
+        const components = [
+            'service-wizard.html',
+            'customer-modal.html',
+            'service-modal.html',
+            'appointment-modal.html'
+        ];
+
+        for (const component of components) {
+            const response = await fetch(`../components/${component}`);
+            if (response.ok) {
+                const html = await response.text();
+                document.getElementById("modal-container").innerHTML += html;
+
+                // Initialize service wizard if loaded
+                if (component === 'service-wizard.html') {
+                    initializeWizard();
+                }
+            } else {
+                console.warn(`Component ${component} could not be loaded`);
+            }
         }
     } catch (error) {
         console.error("Componentler yüklenemedi:", error);
