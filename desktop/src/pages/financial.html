@@ -1,0 +1,37 @@
+<div id="financialPage" class="page">
+    <div class="page-header">
+        <h2>Finansal Yönetim</h2>
+        <div>
+            <button class="btn-primary" onclick="showAddPayment()" style="margin-right: 10px;">💵 Ödeme Ekle</button>
+            <button class="btn btn-secondary" onclick="showAddExpense()">💸 Gider Ekle</button>
+        </div>
+    </div>
+    <div class="stats-grid">
+        <div class="dashboard-card success">
+            <div class="stat-icon">💵</div>
+            <h3>Toplam Gelir</h3>
+            <p class="stat-value" id="totalIncome">0 ₺</p>
+        </div>
+        <div class="dashboard-card danger">
+            <div class="stat-icon">💸</div>
+            <h3>Toplam Gider</h3>
+            <p class="stat-value" id="totalExpense">0 ₺</p>
+        </div>
+        <div class="dashboard-card primary">
+            <div class="stat-icon">📊</div>
+            <h3>Net Kar</h3>
+            <p class="stat-value" id="netProfit">0 ₺</p>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-section">
+            <h3>Son Ödemeler</h3>
+            <div id="recentPayments" class="recent-list"></div>
+        </div>
+        <div class="dashboard-section">
+            <h3>Son Giderler</h3>
+            <div id="recentExpenses" class="recent-list"></div>
+        </div>
+    </div>
+</div>
