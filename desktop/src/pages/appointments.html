@@ -1,0 +1,35 @@
+<!-- /desktop/src/pages/appointments.html -->
+<div id="appointmentsPage" class="page">
+    <div class="page-header">
+        <h2>Randevu Takvimi</h2>
+        <button id="add-appointment-btn" class="btn-primary">+ Yeni Randevu Oluştur</button>
+    </div>
+
+    <div class="calendar-toolbar">
+        <div class="calendar-nav">
+            <button id="prevMonthBtn">‹</button>
+            <h3 id="currentMonthYear">Kasım 2025</h3>
+            <button id="nextMonthBtn">›</button>
+        </div>
+        <div class="calendar-view-switcher">
+            <button class="view-btn active" data-view="month">Ay</button>
+            <button class="view-btn" data-view="week">Hafta</button>
+            <button class="view-btn" data-view="day">Gün</button>
+        </div>
+    </div>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div>Pazartesi</div>
+            <div>Salı</div>
+            <div>Çarşamba</div>
+            <div>Perşembe</div>
+            <div>Cuma</div>
+            <div>Cumartesi</div>
+            <div>Pazar</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Takvim günleri dinamik olarak buraya yüklenecek -->
+        </div>
+    </div>
+</div>

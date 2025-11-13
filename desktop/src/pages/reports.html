@@ -1,0 +1,33 @@
+<!-- /desktop/src/pages/reports.html -->
+<div id="reportsPage" class="page">
+    <div class="page-header">
+        <h2>Raporlama ve Analitik</h2>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="search-filter-bar">
+        <label>Tarih Aralığı:</label>
+        <input type="date" id="reportStartDate">
+        <span>-</span>
+        <input type="date" id="reportEndDate">
+        <button id="generateReportBtn" class="btn btn-primary">Raporu Oluştur</button>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="reports-grid">
+        <div class="dashboard-section chart-container">
+            <h3>Servis Tiplerine Göre Dağılım</h3>
+            <canvas id="serviceTypesChart"></canvas>
+        </div>
+        <div class="dashboard-section chart-container">
+            <h3>Teknisyen Performans Karşılaştırması (Tamamlanan Servis)</h3>
+            <canvas id="technicianPerformanceChart"></canvas>
+        </div>
+        <div class="dashboard-section">
+            <h3>Genel İstatistikler</h3>
+            <div id="generalStats">
+                <!-- İstatistikler dinamik olarak yüklenecek -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,218 +1,144 @@
+// /backend/server-mock.js
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3002;
-const JWT_SECRET = 'akinkombi-secret';
+const JWT_SECRET = 'akinkombi-secret-ultra';
 
 app.use(cors());
 app.use(express.json());
 
-// Mock Data
-let customers = [
-  { customer_id: 1, first_name: 'Ahmet', last_name: 'Yılmaz', phone: '0532 111 2233', email: 'ahmet@example.com', address: 'İstanbul', status: 'active', created_at: new Date() },
-  { customer_id: 2, first_name: 'Mehmet', last_name: 'Demir', phone: '0533 222 3344', email: 'mehmet@example.com', address: 'Ankara', status: 'active', created_at: new Date() }
-];
-
-let services = [
-  { service_id: 1, customer_id: 1, service_type: 'maintenance', status: 'pending', priority: 'normal', problem_description: 'Kombi bakımı', created_at: new Date() },
-  { service_id: 2, customer_id: 2, service_type: 'repair', status: 'in_progress', priority: 'high', problem_description: 'Kombi arızası', created_at: new Date() }
-];
-
-// Auth Middleware
-const auth = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
-  try {
-    req.user = jwt.verify(token, JWT_SECRET);
-    next();
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
+// --- MOCK DATABASE ---
+let DB = {
+    customers: [
+        { id: 1, name: 'Ahmet Yılmaz', phone: '0532 111 2233', city: 'İstanbul', tags: ['vip'], stats: { totalServices: 12, totalSpending: 24500, avgRating: 4.8 } },
+        { id: 2, name: 'Mehmet Demir', phone: '0533 222 3344', city: 'Ankara', tags: ['corporate'], stats: { totalServices: 8, totalSpending: 15200, avgRating: 4.5 } },
+    ],
+    devices: [
+        { id: 1, customer_id: 1, type: 'Kombi', brand: 'Vaillant', model: 'ecoTEC Plus' },
+        { id: 2, customer_id: 1, type: 'Klima', brand: 'Daikin', model: 'Inverter' },
+        { id: 3, customer_id: 2, type: 'Kombi', brand: 'Buderus', model: 'Logamax' },
+    ],
+    technicians: [
+        { id: 1, name: 'Mehmet Demir', status: 'active', monthly_services: 28, avg_rating: 4.7 },
+        { id: 2, name: 'Ali Yılmaz', status: 'active', monthly_services: 25, avg_rating: 4.9 },
+    ],
+    parts: [
+        { id: 1, name: 'Isıtıcı Rezistansı', stock: 3, price: 350, category: 'Isıtma' },
+        { id: 2, name: 'Dolaşım Pompası', stock: 8, price: 850, category: 'Pompa' },
+    ],
+    services: [
+        { id: 101, customer_id: 1, device_id: 1, technician_id: 1, status: 'completed', description: 'Kombi Bakımı', date: '2025-11-10', cost: 850 },
+        { id: 102, customer_id: 2, device_id: 3, technician_id: 2, status: 'in_progress', description: 'Petek Temizliği', date: '2025-11-12', cost: 1200 },
+        { id: 103, customer_id: 1, device_id: 2, technician_id: 1, status: 'pending', description: 'Klima gaz dolumu', date: '2025-11-14', cost: 0 },
+    ],
+    invoices: [
+        { id: 1, service_id: 101, amount: 850, status: 'paid', date: '2025-11-11' },
+    ],
+    appointments: [
+        { id: 1, customer_id: 2, service_type: 'repair', date: '2025-11-15', time: '14:00' }
+    ]
 };
 
-// Login
+// --- API ENDPOINTS ---
+
+// AUTH
 app.post('/api/v1/auth/login', (req, res) => {
-  const { username, password } = req.body;
-  if (username === 'admin' && password === 'admin123') {
-    const token = jwt.sign({ id: 1, username }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ access_token: token, user: { id: 1, username } });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
-  }
+    const { username, password } = req.body;
+    if ((username === 'demo' && password === 'demo') || (username === 'admin' && password === 'admin123')) {
+        const token = jwt.sign({ id: 1, username }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ access_token: token });
+    } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+    }
 });
 
-// Customers
-app.get('/api/v1/customers', auth, (req, res) => {
-  res.json(customers);
+// CUSTOMERS
+app.get('/api/v1/customers', (req, res) => {
+    res.json(DB.customers.map(c => ({...c, customer_id: c.id, first_name: c.name.split(' ')[0], last_name: c.name.split(' ')[1]})));
+});
+app.get('/api/v1/customers/:id', (req, res) => {
+    const customer = DB.customers.find(c => c.id == req.params.id);
+    // Add related data
+    customer.devices = DB.devices.filter(d => d.customer_id == req.params.id);
+    customer.services = DB.services.filter(s => s.customer_id == req.params.id);
+    customer.invoices = DB.invoices.filter(inv => DB.services.some(s => s.id === inv.service_id && s.customer_id == req.params.id));
+    res.json(customer);
 });
 
-app.post('/api/v1/customers', auth, (req, res) => {
-  const newCustomer = {
-    customer_id: customers.length + 1,
-    ...req.body,
-    status: 'active',
-    created_at: new Date()
-  };
-  customers.push(newCustomer);
-  res.json(newCustomer);
+// SERVICES
+app.get('/api/v1/services', (req, res) => {
+    const services = DB.services.map(s => {
+        const customer = DB.customers.find(c => c.id === s.customer_id);
+        const technician = DB.technicians.find(t => t.id === s.technician_id);
+        return {
+            ...s,
+            service_id: s.id,
+            customer_name: customer ? customer.name : 'Bilinmeyen',
+            technician_name: technician ? technician.name : 'Atanmadı',
+            problem_description: s.description,
+            created_at: s.date
+        };
+    });
+    res.json(services);
+});
+app.put('/api/v1/services/:id/status', (req, res) => {
+    const service = DB.services.find(s => s.id == req.params.id);
+    if (service) {
+        service.status = req.body.status;
+        res.json(service);
+    } else {
+        res.status(404).json({ message: 'Not found' });
+    }
 });
 
-app.put('/api/v1/customers/:id', auth, (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = customers.findIndex(c => c.customer_id === id);
-  if (index !== -1) {
-    customers[index] = { ...customers[index], ...req.body };
-    res.json(customers[index]);
-  } else {
-    res.status(404).json({ message: 'Not found' });
-  }
+// TECHNICIANS
+app.get('/api/v1/technicians', (req, res) => res.json(DB.technicians));
+
+// INVENTORY
+app.get('/api/v1/inventory/parts', (req, res) => res.json(DB.parts));
+
+// FINANCIAL
+app.get('/api/v1/financial/invoices', (req, res) => res.json(DB.invoices));
+
+// APPOINTMENTS
+app.get('/api/v1/appointments', (req, res) => res.json(DB.appointments));
+app.post('/api/v1/appointments', (req, res) => {
+    const newAppointment = { id: Date.now() % 1000, ...req.body };
+    DB.appointments.push(newAppointment);
+    // Create a new service automatically
+    const newService = {
+        id: Date.now() % 1000 + 100,
+        customer_id: req.body.customer_id,
+        status: 'planned',
+        description: `Randevu: ${req.body.service_type}`,
+        date: req.body.appointment_date,
+        cost: 0
+    };
+    DB.services.push(newService);
+    res.status(201).json(newAppointment);
 });
 
-app.delete('/api/v1/customers/:id', auth, (req, res) => {
-  const id = parseInt(req.params.id);
-  customers = customers.filter(c => c.customer_id !== id);
-  res.json({ message: 'Deleted' });
+
+// DASHBOARD
+app.get('/api/v1/dashboard/stats', (req, res) => {
+    res.json({
+        todayServices: { total: DB.services.filter(s => s.date === new Date().toISOString().split('T')[0]).length, completed: 0 },
+        activeTechnicians: DB.technicians.filter(t => t.status === 'active').length,
+        criticalStock: DB.parts.filter(p => p.stock <= 5).length,
+        dailyRevenue: DB.invoices.filter(i => i.date === new Date().toISOString().split('T')[0] && i.status === 'paid').reduce((sum, i) => sum + i.amount, 0),
+        serviceTrend: [50, 60, 75, 90, 80, 110, 120, 130, 100, 115, 140, DB.services.length],
+        revenueAnalysis: [15000, 18000, 22000, 28000, 25000, 32000, 35000, 40000, 30000, 33000, 42000, DB.invoices.reduce((sum, i) => sum + i.amount, 0)],
+        liveActivity: [
+            { time: '09:45', text: 'Mehmet Teknisyen → Kadıköy\'de servise başladı (#S-102)' },
+            { time: '09:42', text: 'Ayşe Müşteri → Yeni randevu talebi oluşturdu' },
+        ]
+    });
 });
 
-// Services
-app.get('/api/v1/services', auth, (req, res) => {
-  res.json(services);
-});
-
-app.post('/api/v1/services', auth, (req, res) => {
-  const newService = {
-    service_id: services.length + 1,
-    ...req.body,
-    created_at: new Date()
-  };
-  services.push(newService);
-  res.json(newService);
-});
-
-// Dashboard Stats
-app.get('/api/v1/dashboard/stats', auth, (req, res) => {
-  res.json({
-    totalCustomers: customers.length,
-    totalServices: services.length,
-    totalParts: 150,
-    monthlyRevenue: 45000
-  });
-});
-
-// Appointments
-app.get('/api/v1/appointments', auth, (req, res) => {
-  res.json([
-    { appointment_id: 1, customer_id: 1, appointment_date: '2025-11-15', appointment_time: '10:00', status: 'scheduled', first_name: 'Ahmet', last_name: 'Yılmaz' }
-  ]);
-});
-
-app.post('/api/v1/appointments', auth, (req, res) => {
-  res.json({ appointment_id: 2, ...req.body, status: 'scheduled' });
-});
-
-// Technicians
-app.get('/api/v1/technicians', auth, (req, res) => {
-  res.json([
-    { technician_id: 1, first_name: 'Ali', last_name: 'Veli', phone: '0534 555 6677', specialization: 'Kombi', status: 'active' }
-  ]);
-});
-
-app.post('/api/v1/technicians', auth, (req, res) => {
-  res.json({ technician_id: 2, ...req.body, status: 'active' });
-});
-
-// Inventory
-app.get('/api/v1/inventory/parts', auth, (req, res) => {
-  res.json([
-    { part_id: 1, part_name: 'Termostat', category: 'Elektronik', unit_price: 150, minimum_stock: 10, status: 'active' }
-  ]);
-});
-
-app.post('/api/v1/inventory/parts', auth, (req, res) => {
-  res.json({ part_id: 2, ...req.body, status: 'active' });
-});
-
-// Financial
-app.get('/api/v1/financial/payments', auth, (req, res) => {
-  res.json([
-    { payment_id: 1, amount: 500, payment_method: 'cash', payment_date: '2025-11-10' }
-  ]);
-});
-
-app.get('/api/v1/financial/expenses', auth, (req, res) => {
-  res.json([
-    { expense_id: 1, amount: 200, category: 'Yakıt', expense_date: '2025-11-10' }
-  ]);
-});
-
-// Communications
-app.get('/api/v1/communications/sms', auth, (req, res) => {
-  res.json([
-    { sms_id: 1, phone_number: '0532 111 2233', message: 'Test mesajı', status: 'sent', sent_at: new Date() }
-  ]);
-});
-
-app.get('/api/v1/communications/email', auth, (req, res) => {
-  res.json([
-    { email_id: 1, email: 'test@example.com', subject: 'Test', status: 'sent', sent_at: new Date() }
-  ]);
-});
-
-// Devices
-app.get('/api/v1/devices', auth, (req, res) => {
-  res.json([
-    { device_id: 1, customer_id: 1, device_type: 'Kombi', brand: 'Vaillant', model: 'EcoTec', status: 'active' }
-  ]);
-});
-
-// Settings
-app.get('/api/v1/settings', auth, (req, res) => {
-  res.json({
-    company_name: 'Akın Kombi',
-    company_phone: '0212 555 0000',
-    company_email: 'info@akinkombi.com'
-  });
-});
-
-app.put('/api/v1/settings', auth, (req, res) => {
-  res.json({ message: 'Settings updated' });
-});
-
-// Dashboard Activity
-app.get('/api/v1/dashboard/activity', auth, (req, res) => {
-  res.json([
-    { type: 'service', id: 1, status: 'completed', created_at: new Date() },
-    { type: 'service', id: 2, status: 'pending', created_at: new Date() }
-  ]);
-});
-
-// Reports
-app.get('/api/v1/reports/services', auth, (req, res) => {
-  res.json([
-    { date: '2025-11-10', total_services: 5, total_revenue: 2500 }
-  ]);
-});
-
-app.get('/api/v1/reports/financial', auth, (req, res) => {
-  res.json({
-    payments: [{ date: '2025-11-10', total: 2500 }],
-    expenses: [{ date: '2025-11-10', total: 500 }]
-  });
-});
-
-app.get('/api/v1/reports/technicians', auth, (req, res) => {
-  res.json([
-    { technician_id: 1, first_name: 'Ali', last_name: 'Veli', total_services: 10, avg_rating: 4.5 }
-  ]);
-});
-
-// Health Check
-app.get('/api/v1/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
 
 app.listen(PORT, () => {
-  console.log(`🚀 Mock Server running on port ${PORT}`);
+  console.log(`🚀 Gelişmiş Mock Server çalışıyor, port: ${PORT}`);
 });

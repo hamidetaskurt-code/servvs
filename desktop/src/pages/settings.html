@@ -1,0 +1,237 @@
+<!-- /desktop/src/pages/settings.html -->
+<div id="settingsPage" class="page">
+    <div class="page-header">
+        <h2>Ayarlar ve Yönetim</h2>
+    </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-link active" data-tab="tab-system-settings">Sistem Ayarları</button>
+        <button class="tab-link" data-tab="tab-user-management">Kullanıcı Yönetimi</button>
+        <button class="tab-link" data-tab="tab-automation">Otomasyon Kuralları</button>
+    </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+
+    <!-- System Settings Tab -->
+    <div id="tab-system-settings" class="tab-content active">
+        <h4>Firma Bilgileri</h4>
+        <form id="systemSettingsForm">
+            <div class="form-row">
+                <label>Firma Adı</label>
+                <input type="text" name="company_name" placeholder="Akın Kombi Servis">
+            </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+            <div class="form-row">
+                <label>Firma Telefonu</label>
+                <input type="text" name="company_phone" placeholder="0212 123 4567">
+            </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+            <div class="form-row">
+                <label>Firma E-postası</label>
+                <input type="email" name="company_email" placeholder="info@akinkombi.com">
+            </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+            <button type="submit" class="btn btn-primary">Ayarları Kaydet</button>
+        </form>
+    </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+
+    <!-- User Management Tab -->
+    <div id="tab-user-management" class="tab-content">
+        <h4>Kullanıcılar</h4>
+        <div class="page-header">
+            <span>Mevcut kullanıcıları yönetin ve yeni kullanıcılar ekleyin.</span>
+            <button id="add-user-btn" class="btn-primary">+ Yeni Kullanıcı</button>
+        </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+        <div class="table-container">
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>E-posta</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Kullanıcı listesi dinamik olarak yüklenecek -->
+                </tbody>
+            </table>
+        </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+    </div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>
+</div>
+    <!-- Automation Rules Tab -->
+    <div id="tab-automation" class="tab-content">
+        <h4>Otomasyon Kuralları (Simülasyon)</h4>
+        <p>"EĞER-O ZAMAN" mantığı ile otomatik aksiyonlar oluşturun.</p>
+        <div class="form-row">
+            <label>Tetikleyici (EĞER)</label>
+            <select id="automationTrigger"><option value="service_completed">Servis Tamamlandı</option><option value="invoice_overdue">Fatura Gecikti</option></select>
+        </div>
+        <div class="form-row">
+            <label>Aksiyon (O ZAMAN)</label>
+            <select id="automationAction"><option value="send_sms">Müşteriye SMS Gönder</option><option value="create_task">Yöneticiye Görev Oluştur</option></select>
+        </div>
+        <button id="addRuleBtn" class="btn btn-primary">Kural Ekle</button>
+        <h5 style="margin-top: 20px;">Aktif Kurallar</h5>
+        <ul id="automationRulesList"></ul>
+        <h5 style="margin-top: 20px;">Otomasyon Logları (Simülasyon)</h5>
+        <div id="automationLogs" class="recent-list"></div>
+    </div>

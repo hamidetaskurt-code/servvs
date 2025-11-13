@@ -1,0 +1,43 @@
+<!-- /desktop/src/pages/technician-detail.html -->
+<div id="technicianDetailPage" class="page">
+    <div class="page-header">
+        <h2 id="technicianDetailTitle">Teknisyen Detayı</h2>
+        <button id="backToTechniciansBtn" class="btn btn-secondary">‹ Geri Dön</button>
+    </div>
+
+    <!-- Technician Summary Card -->
+    <div class="technician-summary-card" id="technicianSummaryCard">
+        <!-- Özet bilgileri dinamik olarak yüklenecek -->
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-link active" data-tab="tab-performance">Performans Analizi</button>
+        <button class="tab-link" data-tab="tab-schedule">Takvim ve Planlama</button>
+        <button class="tab-link" data-tab="tab-skills">Yetkinlikler</button>
+        <button class="tab-link" data-tab="tab-orders">İş Emirleri</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-performance" class="tab-content active">
+        <h4>Verimlilik Göstergeleri</h4>
+        <div id="technicianPerformanceMetrics"></div>
+        <h4>Müşteri Memnuniyeti</h4>
+        <div id="technicianSatisfaction"></div>
+    </div>
+
+    <div id="tab-schedule" class="tab-content">
+        <h4>Aylık Takvim</h4>
+        <div id="technicianCalendar"></div>
+    </div>
+
+    <div id="tab-skills" class="tab-content">
+        <h4>Uzmanlık Alanları ve Sertifikalar</h4>
+        <div id="technicianSkills"></div>
+    </div>
+
+    <div id="tab-orders" class="tab-content">
+        <h4>Atanmış Servisler</h4>
+        <div id="technicianServiceOrders"></div>
+    </div>
+</div>

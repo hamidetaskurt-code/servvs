@@ -1,0 +1,48 @@
+<!-- /desktop/src/pages/dashboard.html -->
+<div id="dashboardPage" class="page">
+    <div class="page-header">
+        <h2>Ana Panel</h2>
+    </div>
+
+    <!-- Top Metric Cards -->
+    <div class="stats-grid" id="mainDashboardMetrics">
+        <div class="dashboard-card">
+            <h3>Bugünkü Servisler</h3>
+            <p class="stat-value" id="todayServicesStat">0/0</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Aktif Teknisyenler</h3>
+            <p class="stat-value" id="activeTechniciansStat">0</p>
+        </div>
+        <div class="dashboard-card danger">
+            <h3>Kritik Stoklar</h3>
+            <p class="stat-value" id="criticalStockStat">0</p>
+        </div>
+        <div class="dashboard-card success">
+            <h3>Günlük Gelir</h3>
+            <p class="stat-value" id="dailyRevenueStat">₺0</p>
+        </div>
+    </div>
+
+    <!-- Dynamic Charts -->
+    <div class="dashboard-row">
+        <div class="dashboard-section chart-container">
+            <h3>Servis Trendi (Son 12 Ay)</h3>
+            <canvas id="serviceTrendChart"></canvas>
+        </div>
+        <div class="dashboard-section chart-container">
+            <h3>Gelir Analizi (Aylık)</h3>
+            <canvas id="revenueAnalysisChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Live Activity Feed -->
+    <div class="dashboard-row">
+        <div class="dashboard-section">
+            <h3>Canlı Aktivite Akışı</h3>
+            <div id="liveActivityFeed" class="recent-list">
+                <!-- Aktiviteler dinamik olarak yüklenecek -->
+            </div>
+        </div>
+    </div>
+</div>
