@@ -1,0 +1,49 @@
+<!-- /desktop/src/components/appointment-modal.html -->
+<div id="appointmentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-close">&times;</span>
+            <h2>Yeni Randevu Oluştur</h2>
+        </div>
+        <div class="modal-body">
+            <form id="appointmentForm">
+                <div class="form-row">
+                    <label>Müşteri *</label>
+                    <select name="customer_id" required>
+                        <option value="">Müşteri Seçin</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Servis Tipi *</label>
+                    <select name="service_type" required>
+                        <option value="repair">Arıza Tamiri</option>
+                        <option value="maintenance">Bakım</option>
+                        <option value="installation">Kurulum</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Teknisyen</label>
+                    <select name="technician_id">
+                        <option value="">Otomatik Ata</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Randevu Tarihi *</label>
+                    <input type="date" name="appointment_date" required>
+                </div>
+                <div class="form-row">
+                    <label>Randevu Saati</label>
+                    <input type="time" name="appointment_time">
+                </div>
+                 <div class="form-row">
+                    <label>Açıklama</label>
+                    <textarea name="description" placeholder="Randevu ile ilgili notlar..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('appointmentModal')">İptal</button>
+            <button type="submit" form="appointmentForm" class="btn btn-primary">Randevuyu Kaydet</button>
+        </div>
+    </div>
+</div>
