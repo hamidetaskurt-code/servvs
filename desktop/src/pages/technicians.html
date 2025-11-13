@@ -1,0 +1,21 @@
+<!-- /desktop/src/pages/technicians.html -->
+<div id="techniciansPage" class="page">
+    <div class="page-header">
+        <h2>Teknisyen Yönetimi</h2>
+        <button id="add-technician-btn" class="btn-primary">+ Yeni Teknisyen</button>
+    </div>
+
+    <div class="search-filter-bar">
+        <input type="text" id="technicianSearch" placeholder="🔍 Teknisyen ara..." oninput="filterTechnicians()">
+        <select id="technicianStatusFilter" onchange="filterTechnicians()">
+            <option value="">Tüm Durumlar</option>
+            <option value="active">Aktif</option>
+            <option value="on_leave">İzinli</option>
+            <option value="inactive">Pasif</option>
+        </select>
+    </div>
+
+    <div class="technician-grid" id="technicianGrid">
+        <!-- Teknisyen kartları buraya dinamik olarak yüklenecek -->
+    </div>
+</div>
