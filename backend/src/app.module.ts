@@ -33,6 +33,9 @@ import { SettingsModule } from './modules/settings/settings.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
         logging: configService.get('NODE_ENV') === 'development',
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }),
       inject: [ConfigService],
     }),
