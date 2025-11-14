@@ -68,12 +68,27 @@ function setupLogin() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
+        // Demo mode
         if (username === 'demo' && password === 'demo') {
             setAuthToken('demo-token-12345');
             showDashboard();
             navigateToPage('dashboard');
             showNotification('Demo modunda giriş yapıldı', 'success');
             return;
+        }
+
+        // Real API login
+        try {
+            const response = await apiCall('/auth/login', 'POST', { username, password });
+            if (response.token) {
+                setAuthToken(response.token);
+                showDashboard();
+                navigateToPage('dashboard');
+                showNotification('Giriş başarılı', 'success');
+            }
+        } catch (error) {
+            document.getElementById('loginError').textContent = 'Kullanıcı adı veya şifre hatalı';
+            showNotification('Giriş başarısız: ' + error.message, 'error');
         }
     });
 }

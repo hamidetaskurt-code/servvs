@@ -2,7 +2,7 @@
 
 import { apiCall } from './api.js';
 import { showLoading, hideLoading, showNotification } from './ui.js';
-import Chart from 'chart.js/auto';
+// Chart.js loaded via CDN in index.html
 
 let serviceTrendChart;
 let revenueAnalysisChart;
