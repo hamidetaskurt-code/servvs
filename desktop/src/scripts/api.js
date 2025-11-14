@@ -1,6 +1,6 @@
 // /desktop/src/scripts/api.js
 
-const API_BASE_URL = 'https://fantastic-space-acorn-g4q4gr7q7wwj39p6-3002.app.github.dev/api/v1';
+const API_BASE_URL = 'http://localhost:3002/api/v1';
 let authToken = localStorage.getItem('authToken');
 
 export function setAuthToken(token) {
