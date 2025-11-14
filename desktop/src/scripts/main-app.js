@@ -65,15 +65,18 @@ function setupLogin() {
     const loginForm = document.getElementById('loginForm');
     loginForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const username = document.getElementById('username').value;
+        const email = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        if (username === 'demo' && password === 'demo') {
-            setAuthToken('demo-token-12345');
+        try {
+            const result = await apiCall('/auth/login', 'POST', { email, password });
+            setAuthToken(result.access_token);
             showDashboard();
             navigateToPage('dashboard');
-            showNotification('Demo modunda giriş yapıldı', 'success');
-            return;
+            showNotification(`Hoşgeldiniz ${result.user.fullName}!`, 'success');
+        } catch (error) {
+            showNotification('Giriş başarısız: ' + error.message, 'error');
+            console.error('Login hatası:', error);
         }
     });
 }

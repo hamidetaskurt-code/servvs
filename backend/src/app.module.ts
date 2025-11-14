@@ -6,6 +6,7 @@ import { CustomersModule } from './modules/customers/customers.module';
 import { ServicesModule } from './modules/services/services.module';
 import { PartsModule } from './modules/parts/parts.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { FinanceModule } from './modules/finance/finance.module';
 import { RoutesModule } from './modules/routes/routes.module';
 import { RouteOptimizationModule } from './modules/route-optimization/route-optimization.module';
@@ -32,7 +33,7 @@ import { SettingsModule } from './modules/settings/settings.module';
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: false,
       }),
       inject: [ConfigService],
     }),
@@ -41,6 +42,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     ServicesModule,
     PartsModule,
     UsersModule,
+    AuthModule,
     FinanceModule,
     RoutesModule,
     RouteOptimizationModule,
