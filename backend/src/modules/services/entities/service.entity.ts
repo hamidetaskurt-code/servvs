@@ -23,13 +23,14 @@ import { ServicePhoto } from './service-photo.entity';
  */
 @Entity('services')
 export class Service extends BaseEntity {
-  @Column({ type: 'varchar', length: 20, unique: true })
+  @Column({ type: 'varchar', length: 20, unique: true, name: 'service_number' })
   @Index()
   serviceNumber: string; // Örn: S-2024-1234
 
   @Column({
     type: 'enum',
     enum: ServiceType,
+    name: 'service_type',
   })
   serviceType: ServiceType;
 
@@ -49,7 +50,7 @@ export class Service extends BaseEntity {
   priority: Priority;
 
   // Arıza tanımı
-  @Column({ type: 'text' })
+  @Column({ type: 'text', name: 'problem_description' })
   problemDescription: string;
 
   // Teknisyen teşhisi
@@ -57,89 +58,89 @@ export class Service extends BaseEntity {
   diagnosis?: string;
 
   // Yapılan işlemler özeti
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'work_performed' })
   workPerformed?: string;
 
   // Tarih ve saat bilgileri
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', name: 'scheduled_date' })
   @Index()
   scheduledDate: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'started_at' })
   startedAt?: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'completed_at' })
   completedAt?: Date;
 
   // Tahmini süre (dakika)
-  @Column({ type: 'int', default: 120 })
+  @Column({ type: 'int', default: 120, name: 'estimated_duration' })
   estimatedDuration: number;
 
   // Gerçek süre (dakika)
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'actual_duration' })
   actualDuration?: number;
 
   // Garanti kapsamında mı?
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'is_under_warranty' })
   isUnderWarranty: boolean;
 
   // Maliyet bilgileri
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, name: 'labor_cost' })
   laborCost: number; // İşçilik
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, name: 'parts_cost' })
   partsCost: number; // Parça maliyeti
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, name: 'total_cost' })
   totalCost: number; // Toplam
 
   // Müşteri memnuniyeti
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'customer_rating' })
   customerRating?: number; // 1-5
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'customer_feedback' })
   customerFeedback?: string;
 
   // İmzalar (base64 veya dosya yolu)
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'technician_signature' })
   technicianSignature?: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'customer_signature' })
   customerSignature?: string;
 
   // Notlar
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'internal_notes' })
   internalNotes?: string; // İç notlar (sadece personel görür)
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'technician_recommendation' })
   technicianRecommendation?: string; // Teknisyen tavsiyeleri
 
   // İptal nedeni
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'cancellation_reason' })
   cancellationReason?: string;
 
   // Relations
   @ManyToOne(() => Customer, (customer) => customer.services)
-  @JoinColumn({ name: 'customerId' })
+  @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'customer_id' })
   @Index()
   customerId: string;
 
   @ManyToOne(() => Device, (device) => device.services, { nullable: true })
-  @JoinColumn({ name: 'deviceId' })
+  @JoinColumn({ name: 'device_id' })
   device?: Device;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'device_id' })
   @Index()
   deviceId?: string;
 
   @ManyToOne(() => User, (user) => user.assignedServices, { nullable: true })
-  @JoinColumn({ name: 'technicianId' })
+  @JoinColumn({ name: 'technician_id' })
   assignedTechnician?: User;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'technician_id' })
   @Index()
   technicianId?: string;
 
