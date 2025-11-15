@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './modules/auth/auth.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { ServicesModule } from './modules/services/services.module';
@@ -36,6 +37,7 @@ import { SettingsModule } from './modules/settings/settings.module';
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
     DashboardModule,
     CustomersModule,
     ServicesModule,
