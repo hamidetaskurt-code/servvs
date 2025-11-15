@@ -33,7 +33,11 @@ import { SettingsModule } from './modules/settings/settings.module';
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: true,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+        connectTimeoutMS: 10000,
       }),
       inject: [ConfigService],
     }),
