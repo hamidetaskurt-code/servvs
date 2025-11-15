@@ -176,6 +176,15 @@ function setupTabNavigation() {
     });
 }
 
+export function setupServiceEventListeners() {
+    // Event listener for adding new service
+    document.getElementById('add-service-btn')?.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('openServiceWizard'));
+    });
+
+    // Setup drag and drop will be initialized in loadServices
+}
+
 export function setupServiceDetailEventListeners() {
     document.getElementById('backToKanbanBtn')?.addEventListener('click', () => {
         window.dispatchEvent(new CustomEvent('navigateToPage', { detail: { page: 'services' } }));

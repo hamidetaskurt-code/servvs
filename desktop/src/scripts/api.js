@@ -44,7 +44,7 @@ export async function apiCall(endpoint, method = 'GET', data = null) {
         return result;
     } catch (error) {
         console.error('API Hatası:', error);
-        showNotification(`API Hatası: ${error.message}`, 'error');
+        // Note: showNotification is called by the importing module
         throw error;
     }
 }

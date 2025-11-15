@@ -118,6 +118,7 @@ function navigateToPage(pageName, id = null) {
 
             switch(pageName) {
                 case 'dashboard':
+                    loadDashboardData();
                     break;
                 case 'customers':
                     loadCustomers();
@@ -136,20 +137,20 @@ function navigateToPage(pageName, id = null) {
                     setupTechnicianEventListeners();
                     break;
                 case 'technician-detail':
+                    loadTechnicianDetail(id);
+                    setupTechnicianDetailEventListeners();
+                    break;
                 case 'inventory':
-                case 'financial':
-                case 'appointments':
-                    loadAppointments();
-                    setupAppointmentsEventListeners();
-                    break;
-                    loadFinancialData();
-                    setupFinancialEventListeners();
-                    break;
                     loadInventory();
                     setupInventoryEventListeners();
                     break;
-                    loadTechnicianDetail(id);
-                    setupTechnicianDetailEventListeners();
+                case 'financial':
+                    loadFinancialData();
+                    setupFinancialEventListeners();
+                    break;
+                case 'appointments':
+                    loadAppointments();
+                    setupAppointmentsEventListeners();
                     break;
             }
         })

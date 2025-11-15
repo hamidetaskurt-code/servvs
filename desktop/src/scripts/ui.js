@@ -52,6 +52,7 @@ export function updateDashboardStats(data) {
 
 export function renderTable(tableId, data, columns) {
     const tbody = document.querySelector(`#${tableId} tbody`);
+    if (!tbody) return;
     tbody.innerHTML = '';
     if (!data || data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="${columns.length}">Veri bulunamadı.</td></tr>`;
@@ -66,4 +67,9 @@ export function renderTable(tableId, data, columns) {
         });
         tbody.appendChild(row);
     });
+}
+
+// Make showNotification available globally for global-functions.js
+if (typeof window !== 'undefined') {
+    window.showNotification = showNotification;
 }
