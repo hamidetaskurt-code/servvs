@@ -108,7 +108,7 @@ function navigateToPage(pageName, id = null) {
     const mainPage = pageName.split('-')[0];
     document.querySelector(`.nav-item[data-page="${mainPage}"]`)?.classList.add('active');
 
-    fetch(`${pageName}.html`)
+    fetch(`../pages/${pageName}.html`)
         .then(response => {
             if (!response.ok) throw new Error('Sayfa bulunamadı');
             return response.text();
@@ -116,8 +116,15 @@ function navigateToPage(pageName, id = null) {
         .then(html => {
             document.getElementById('main-content').innerHTML = html;
 
+            // Make loaded page visible by adding active class
+            const pageElement = document.querySelector('.page');
+            if (pageElement) {
+                pageElement.classList.add('active');
+            }
+
             switch(pageName) {
                 case 'dashboard':
+                    loadDashboardData();
                     break;
                 case 'customers':
                     loadCustomers();
@@ -136,20 +143,20 @@ function navigateToPage(pageName, id = null) {
                     setupTechnicianEventListeners();
                     break;
                 case 'technician-detail':
+                    loadTechnicianDetail(id);
+                    setupTechnicianDetailEventListeners();
+                    break;
                 case 'inventory':
-                case 'financial':
-                case 'appointments':
-                    loadAppointments();
-                    setupAppointmentsEventListeners();
-                    break;
-                    loadFinancialData();
-                    setupFinancialEventListeners();
-                    break;
                     loadInventory();
                     setupInventoryEventListeners();
                     break;
-                    loadTechnicianDetail(id);
-                    setupTechnicianDetailEventListeners();
+                case 'financial':
+                    loadFinancialData();
+                    setupFinancialEventListeners();
+                    break;
+                case 'appointments':
+                    loadAppointments();
+                    setupAppointmentsEventListeners();
                     break;
             }
         })
